@@ -1,12 +1,9 @@
 package com.echomine.net;
 
+import alt.java.net.SocketImpl;
 import com.echomine.util.IOUtil;
-import com.sun.net.ssl.KeyManagerFactory;
-import com.sun.net.ssl.SSLContext;
-import com.sun.net.ssl.TrustManager;
 
-import javax.net.ssl.SSLSocket;
-import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.*;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -37,17 +34,29 @@ import java.security.cert.CertificateException;
  */
 public class SocketConnector extends TimeableConnection {
 
-    /** property that sets the name of the key store file */
+    /**
+     * property that sets the name of the key store file
+     */
     private static final String KEY_KEYSTORE = "com.echomine.net.keyStorePath";
-    /** default value of the key store file - ~/.keystore */
+    /**
+     * default value of the key store file - ~/.keystore
+     */
     private static final String VALUE_KEYSTORE = System.getProperty("user.home") + System.getProperty("file.separator") + ".keystore";
-    /** property that sets the key store password */
+    /**
+     * property that sets the key store password
+     */
     private static final String KEY_PASSPHRASE = "com.echomine.net.keyStorePassphrase";
-    /** default value of the key store password - "" */
+    /**
+     * default value of the key store password - ""
+     */
     private static final String VALUE_PASSPHRASE = "";
-    /** property that sets the class name of the trust manager */
+    /**
+     * property that sets the class name of the trust manager
+     */
     private static final String KEY_TRUSTMANAGER = "com.echomine.net.trustManager";
-    /** default value of the trust manager implementation class */
+    /**
+     * default value of the trust manager implementation class
+     */
     private static final String VALUE_TRUSTMANAGER = "com.echomine.util.SimpleTrustManager";
 
     private SocketHandler socketHandler;
@@ -71,7 +80,9 @@ public class SocketConnector extends TimeableConnection {
         connect(socketHandler, connectionModel);
     }
 
-    /** helper to return the String array of all ciphers we could use */
+    /**
+     * helper to return the String array of all ciphers we could use
+     */
     private String[] getCiphers(SSLSocket s) {
         int num = 0;
         String[] supported = s.getSupportedCipherSuites(); // cipher suites supported by the implementation
@@ -96,8 +107,6 @@ public class SocketConnector extends TimeableConnection {
         String keyStorePath = System.getProperty(KEY_KEYSTORE, VALUE_KEYSTORE);
         String keyStorePassphrase = System.getProperty(KEY_PASSPHRASE, VALUE_PASSPHRASE);
         char[] keyStorePassword = keyStorePassphrase.toCharArray();
-        // dynamically set SunJSSE as a security provider
-        Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider()); // throws SecurityException
         // Open the keystore file.
         FileInputStream keyStoreIStream = null;
         try {
@@ -213,18 +222,20 @@ public class SocketConnector extends TimeableConnection {
         return socket;
     }
 
-    /** Synchronous connect method.  The method will return when handling of the connection is finished. */
+    /**
+     * Synchronous connect method.  The method will return when handling of the connection is finished.
+     */
     public void connect(SocketHandler socketHandler, ConnectionModel connectionModel) throws ConnectionFailedException {
-        Socket socket = null;
+        alt.java.net.Socket socket = null;
         try {
             ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
             ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
             fireConnectionStarting(event, vetoEvent);
             socketHandler.start();
             if (connectionModel.isSSL()) {
-                socket = negotiateSSLConnection(connectionModel);  // throws IOException
+                socket = new SocketImpl(negotiateSSLConnection(connectionModel));  // throws IOException
             } else {
-                socket = new Socket(connectionModel.getHost(), connectionModel.getPort());
+                socket = new SocketImpl(new Socket(connectionModel.getHost(), connectionModel.getPort()));
             }
             try {
                 event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
@@ -260,40 +271,39 @@ public class SocketConnector extends TimeableConnection {
      * the caller of the method immediately.
      */
     public void aconnect(final SocketHandler socketHandler, final ConnectionModel connectionModel) {
-        Thread thread = new Thread(
-                new Runnable() {
-                    public void run() {
-                        Socket socket = null;
-                        try {
-                            ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
-                            ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
-                            fireConnectionStarting(event, vetoEvent);
-                            socketHandler.start();
-                            if (connectionModel.isSSL()) {
-                                socket = negotiateSSLConnection(connectionModel);
-                            } else {
-                                socket = new Socket(connectionModel.getHost(), connectionModel.getPort());
-                            }
-                            try {
-                                event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
-                                fireConnectionEstablished(event);
-                                socketHandler.handle(socket);
-                                event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_CLOSED);
-                                fireConnectionClosed(event);
-                            } catch (IOException ex) {
-                                event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error while handling connection: " + ex.getMessage());
-                                fireConnectionClosed(event);
-                            } finally {
-                                IOUtil.closeSocket(socket);
-                            }
-                        } catch (IOException ex) {
-                            ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error..." + ex.getMessage());
-                            fireConnectionClosed(event);
-                        } catch (ConnectionVetoException ex) {
-                            //do nothing, connection closed event already fired
-                        }
+        Thread thread = new Thread(new Runnable() {
+            public void run() {
+                alt.java.net.Socket socket = null;
+                try {
+                    ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
+                    ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
+                    fireConnectionStarting(event, vetoEvent);
+                    socketHandler.start();
+                    if (connectionModel.isSSL()) {
+                        socket = new SocketImpl(negotiateSSLConnection(connectionModel));
+                    } else {
+                        socket = new SocketImpl(new Socket(connectionModel.getHost(), connectionModel.getPort()));
                     }
-                });
+                    try {
+                        event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
+                        fireConnectionEstablished(event);
+                        socketHandler.handle(socket);
+                        event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_CLOSED);
+                        fireConnectionClosed(event);
+                    } catch (IOException ex) {
+                        event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error while handling connection: " + ex.getMessage());
+                        fireConnectionClosed(event);
+                    } finally {
+                        IOUtil.closeSocket(socket);
+                    }
+                } catch (IOException ex) {
+                    ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error..." + ex.getMessage());
+                    fireConnectionClosed(event);
+                } catch (ConnectionVetoException ex) {
+                    //do nothing, connection closed event already fired
+                }
+            }
+        });
         thread.start();
     }
 

@@ -4,6 +4,8 @@ import com.echomine.common.SendMessageFailedException;
 import com.echomine.jabber.msg.RosterIQMessage;
 import com.echomine.jabber.msg.RosterItem;
 
+import java.util.List;
+
 /**
  * <p>Contains all the methods to work with rosters.  Roster Management is really simple.</p>
  * <p>Few things to note about roster management.  If you're adding a user to the roster, you will not be notified of the
@@ -26,18 +28,24 @@ public class JabberRosterService {
     /**
      * requests the server to send a list of the roster, the reply will be
      * sent to roster listeners, so be sure to listen for the events.
+     *
      * @param wait true if the caller wants to wait until there is a reply to the message
+     * @return a list of RosterItem objects or null if wait is false.
      */
-    public void requestRosterList(boolean wait) throws SendMessageFailedException {
+    public List requestRosterList(boolean wait) throws SendMessageFailedException {
         RosterIQMessage msg = new RosterIQMessage(JabberIQMessage.TYPE_GET);
         msg.setSynchronized(wait);
         session.sendMessage(msg);
+        RosterIQMessage replymsg = (RosterIQMessage) msg.getReplyMessage();
+        if (replymsg != null) return replymsg.getRosterItems();
+        return null;
     }
 
     /**
      * this is a convenience method to add a JID to the roster.  It probably will satisfy
      * 80% of the uses.  If you need to set more features, then you should create your own
      * message and use the other addToRoster() method (ie. multiple groups rather than just one).
+     *
      * @param wait true if the caller wants to wait until there is a reply to the message
      */
     public void addToRoster(JID jid, String name, String group, boolean wait) throws SendMessageFailedException {
@@ -49,6 +57,7 @@ public class JabberRosterService {
 
     /**
      * adds a roster item to the list stored on the server.
+     *
      * @param wait true if the caller wants to wait until there is a reply to the message
      */
     public void addToRoster(RosterItem item, boolean wait) throws SendMessageFailedException {
@@ -61,6 +70,7 @@ public class JabberRosterService {
 
     /**
      * a convenience method to remove a JID from the roster.
+     *
      * @param wait true if the caller wants to wait until there is a reply to the message
      */
     public void removeFromRoster(JID jid, boolean wait) throws SendMessageFailedException {
@@ -71,6 +81,7 @@ public class JabberRosterService {
 
     /**
      * removes a specific item from the roster
+     *
      * @param wait true if the caller wants to wait until there is a reply to the message
      */
     public void removeFromRoster(RosterItem item, boolean wait) throws SendMessageFailedException {

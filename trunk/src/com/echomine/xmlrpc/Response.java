@@ -19,29 +19,44 @@ public class Response {
     private Namespace ns;
     private SerializerFactory factory;
 
-    /** an empty constructor that is useful when you want to set the data with object information */
+    /**
+     * an empty constructor that is useful when you want to set the data with object information
+     */
     public Response(SerializerFactory factory) {
+        if (factory == null) throw new IllegalArgumentException("Factory cannot be null");
         this.factory = factory;
     }
 
-    /** constructs a response with the proper return data */
+    /**
+     * constructs a response with the proper return data
+     */
     public Response(Object response, SerializerFactory factory) {
+        if (factory == null) throw new IllegalArgumentException("Factory cannot be null");
         this.factory = factory;
         setResponse(response);
     }
 
-    /** constructs an error response with the provided fault code and error string */
+    /**
+     * constructs an error response with the provided fault code and error string
+     */
     public Response(int faultCode, String faultString, SerializerFactory factory) {
+        if (factory == null) throw new IllegalArgumentException("Factory cannot be null");
         this.factory = factory;
         setErrorResponse(faultCode, faultString);
     }
 
-    /** constructs a response from a dom element. This is normally used to parse an incoming message */
-    public Response(Element elem) {
+    /**
+     * constructs a response from a dom element. This is normally used to parse an incoming message
+     */
+    public Response(Element elem, SerializerFactory factory) {
+        if (factory == null) throw new IllegalArgumentException("Factory cannot be null");
+        this.factory = factory;
         parse(elem);
     }
 
-    /** parses a response from the element. This will reset all the internal data before parsing */
+    /**
+     * parses a response from the element. This will reset all the internal data before parsing
+     */
     public void parse(Element elem) {
         faultString = null;
         faultCode = 0;
@@ -80,7 +95,9 @@ public class Response {
         return ns;
     }
 
-    /** check if the response is a fault/error response */
+    /**
+     * check if the response is a fault/error response
+     */
     public boolean isFault() {
         return isFault;
     }

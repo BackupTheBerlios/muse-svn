@@ -1,13 +1,16 @@
 package com.echomine.net;
 
+import alt.java.net.Socket;
+import alt.java.net.SocketImpl;
 import com.echomine.util.IOUtil;
 import junit.framework.TestCase;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 
-/** this tests all the possible socket acceptor codes */
+/**
+ * this tests all the possible socket acceptor codes
+ */
 public class SocketConnectorTest extends TestCase {
     ConnectionModel model;
     SocketConnector connector;
@@ -45,7 +48,7 @@ public class SocketConnectorTest extends TestCase {
         thr.close();
         //sleep for a short period so that there is time for the thread and socket
         //to close down
-        Thread.currentThread().sleep(200);
+        Thread.sleep(200);
     }
 
     /**
@@ -54,7 +57,7 @@ public class SocketConnectorTest extends TestCase {
     public void testSocketConnectorNormalAsync() throws Exception {
         thr.start();
         connector.aconnect(model);
-        Thread.currentThread().sleep(500);
+        Thread.sleep(500);
         assertEquals("Success", thr.str);
     }
 
@@ -63,9 +66,9 @@ public class SocketConnectorTest extends TestCase {
      */
     public void testSocketConnectorNormalSync() throws Exception {
         thr.start();
-        Thread.currentThread().sleep(500);
+        Thread.sleep(500);
         connector.connect(model);
-        while (!thr.isFinished) Thread.currentThread().yield();
+        while (!thr.isFinished) Thread.yield();
         assertEquals("Success", thr.str);
     }
 
@@ -75,7 +78,7 @@ public class SocketConnectorTest extends TestCase {
     public void testConnectorConnectionListener() throws Exception {
         ConnectorConnectionListener l = new ConnectorConnectionListener();
         thr.start();
-        Thread.currentThread().sleep(500);
+        Thread.sleep(500);
         connector.addConnectionListener(l);
         connector.connect(model);
         assertTrue(l.starting == true);
@@ -89,7 +92,7 @@ public class SocketConnectorTest extends TestCase {
     public void testConnectorVetoedConnectionListener() throws Exception {
         VetoedConnectionListener l = new VetoedConnectionListener();
         thr.start();
-        Thread.currentThread().sleep(500);
+        Thread.sleep(500);
         connector.addConnectionListener(l);
         connector.connect(model);
         assertTrue(l.starting == true);
@@ -138,7 +141,7 @@ public class SocketConnectorTest extends TestCase {
             Socket socket = null;
             isFinished = false;
             try {
-                socket = ssocket.accept();
+                socket = new SocketImpl(ssocket.accept());
                 byte[] data = new byte[10];
                 int bread = socket.getInputStream().read(data);
                 str = new String(data, 0, bread);

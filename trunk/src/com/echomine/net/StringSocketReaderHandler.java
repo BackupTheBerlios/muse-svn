@@ -1,8 +1,9 @@
 package com.echomine.net;
 
+import alt.java.net.Socket;
+
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.Socket;
 
 /** an easy handler that reads in a string and then disconnects immediately */
 public class StringSocketReaderHandler extends StringSocketHandler {

@@ -66,7 +66,7 @@ public abstract class AbstractGnutellaConnection extends TimeableConnection impl
     }
 
     /** @return vendor feature headers, can be null */
-    public HTTPHeader getVendorFeartureHeaders() {
+    public HTTPHeader getVendorFeatureHeaders() {
         return gnutellaHandler.getVendorFeatureHeaders();
     }
 

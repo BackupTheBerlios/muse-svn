@@ -15,14 +15,17 @@ import java.util.List;
  * for agent listing (ie. jabber.org).  However, some others do not (specifically jabber.com).  Thus,
  * for compatibility, the jabber:iq:agents namespace is supported.</p>
  * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0094.html">JEP-0094 Version 0.1</a></b></p>
- * @deprecated Replaced by new JEP-0030 Service Discovery
+ *
  * @see ServiceInfoIQMessage
  * @see ServiceItemsIQMessage
+ * @deprecated Replaced by new JEP-0030 Service Discovery
  */
 public class AgentsIQMessage extends JabberIQMessage {
     private ArrayList agents = new ArrayList();
 
-    /** defaults to iq type get for retrieval or for parsing incoming messages */
+    /**
+     * defaults to iq type get for retrieval or for parsing incoming messages
+     */
     public AgentsIQMessage() {
         super(TYPE_GET);
         //add in the query element
@@ -31,13 +34,16 @@ public class AgentsIQMessage extends JabberIQMessage {
 
     /**
      * retrieve the list of agents.
+     *
      * @return a List of Agent objects
      */
     public List getAgentList() {
         return agents;
     }
 
-    /** parses the incoming message for the data */
+    /**
+     * parses the incoming message for the data
+     */
     public JabberMessage parse(JabberMessageParser parser, Element msgTree) throws ParseException {
         //reset the message
         agents.clear();

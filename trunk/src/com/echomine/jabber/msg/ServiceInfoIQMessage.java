@@ -25,7 +25,8 @@ import java.util.List;
  * see what happens.</p>
  * <p>Read up on the list of categories, namespaces, and types at the Jabber Registry for an up-to-date list that
  * you may use.  The registrar is located at <a href="http://www.jabber.org/registrar/">http://www.jabber.org/registrar/</a></p>
- * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0030.html">JEP-0030 Version 1.0</a></b></p>
+ * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0030.html">JEP-0030 Version 2.0</a></b></p>
+ *
  * @see ServiceItemsIQMessage
  * @since 0.8a4
  */
@@ -35,7 +36,9 @@ public class ServiceInfoIQMessage extends JabberIQMessage {
     private ArrayList identities = new ArrayList();
     private ArrayList features = new ArrayList();
 
-    /** defaults to iq type get for retrieval or for parsing incoming messages */
+    /**
+     * defaults to iq type get for retrieval or for parsing incoming messages
+     */
     public ServiceInfoIQMessage(String type) {
         super(type);
         //add in the query element
@@ -46,22 +49,30 @@ public class ServiceInfoIQMessage extends JabberIQMessage {
         this(TYPE_GET);
     }
 
-    /** @return the message type id */
+    /**
+     * @return the message type id
+     */
     public int getMessageType() {
         return JabberCode.MSG_IQ_DISCO_INFO;
     }
 
-    /** @return the optional node name of the message, or null if none exists. */
+    /**
+     * @return the optional node name of the message, or null if none exists.
+     */
     public String getNode() {
         return node;
     }
 
-    /** sets the node to the specified node value, or null to set it to none */
+    /**
+     * sets the node to the specified node value, or null to set it to none
+     */
     public void setNode(String node) {
         this.node = node;
     }
 
-    /** adds a new identity to the list of services that are supported */
+    /**
+     * adds a new identity to the list of services that are supported
+     */
     public void addIdentity(ServiceIdentity identity) {
         if (identity == null)
             throw new IllegalArgumentException("Identity to add cannot be null");
@@ -78,17 +89,23 @@ public class ServiceInfoIQMessage extends JabberIQMessage {
         features.add(feature);
     }
 
-    /** @return a unmodifiable list of ServiceIdentity objects */
+    /**
+     * @return a unmodifiable list of ServiceIdentity objects
+     */
     public List getIdentities() {
         return Collections.unmodifiableList(identities);
     }
 
-    /** @return a unmodifiable list of String objects representing features */
+    /**
+     * @return a unmodifiable list of String objects representing features
+     */
     public List getFeatures() {
         return Collections.unmodifiableList(features);
     }
 
-    /** parses the additional data out of the DOM */
+    /**
+     * parses the additional data out of the DOM
+     */
     public JabberMessage parse(JabberMessageParser parser, Element msgTree) throws ParseException {
         super.parse(parser, msgTree);
         if (!features.isEmpty()) features.clear();
@@ -126,7 +143,9 @@ public class ServiceInfoIQMessage extends JabberIQMessage {
         return this;
     }
 
-    /** encodes the additional data */
+    /**
+     * encodes the additional data
+     */
     public String encode() throws ParseException {
         Namespace ns = JabberCode.XMLNS_IQ_DISCO_INFO;
         Element query = getDOM().getChild("query", ns);

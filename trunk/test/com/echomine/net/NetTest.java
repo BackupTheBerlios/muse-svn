@@ -1,14 +1,9 @@
 package com.echomine.net;
 
 import junit.framework.TestCase;
-import com.echomine.net.*;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.net.Socket;
-import java.io.IOException;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 
 public class NetTest extends TestCase {
     public NetTest(String name) {
@@ -30,7 +25,7 @@ public class NetTest extends TestCase {
             assertEquals(amodel, bmodel);
             assertEquals(cmodel, dmodel);
             assertEquals(amodel, emodel);
-        } catch(UnknownHostException ex) {
+        } catch (UnknownHostException ex) {
             fail("Unknown Host Exception: " + ex.getMessage());
         }
     }

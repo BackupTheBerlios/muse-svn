@@ -1,10 +1,11 @@
 package com.echomine.net;
 
+import alt.java.net.Socket;
+import alt.java.net.SocketImpl;
 import com.echomine.util.IOUtil;
 import junit.framework.TestCase;
 
 import java.io.IOException;
-import java.net.Socket;
 
 public class PerpetualSocketAcceptorTest extends TestCase {
     ConnectionModel model;
@@ -45,7 +46,7 @@ public class PerpetualSocketAcceptorTest extends TestCase {
         acceptor.close();
         //sleep for a short period so that there is time for the thread and socket
         //to close down
-        Thread.currentThread().sleep(100);
+        Thread.sleep(100);
     }
 
     /**
@@ -58,7 +59,7 @@ public class PerpetualSocketAcceptorTest extends TestCase {
         int numPasses = 0;
         for (int i = 0; i < 3; i++, numPasses++) {
             //now let's simulate a connect
-            Socket socket = new Socket("127.0.0.1", 7000);
+            Socket socket = new SocketImpl(new java.net.Socket("127.0.0.1", 7000));
             byte[] data = new byte[10];
             int bytesRead = socket.getInputStream().read(data);
             if (bytesRead == -1)
@@ -84,7 +85,7 @@ public class PerpetualSocketAcceptorTest extends TestCase {
         int numPasses = 0;
         for (int i = 0; i < 3; i++, numPasses++) {
             //now let's simulate a connect
-            Socket socket = new Socket("127.0.0.1", 7000);
+            Socket socket = new SocketImpl(new java.net.Socket("127.0.0.1", 7000));
             byte[] data = new byte[10];
             int bytesRead = socket.getInputStream().read(data);
             if (bytesRead == -1)
@@ -103,9 +104,9 @@ public class PerpetualSocketAcceptorTest extends TestCase {
         AcceptorConnectionListener l = new AcceptorConnectionListener();
         acceptor.aaccept(handler);
         acceptor.addConnectionListener(l);
-        Socket socket = new Socket("127.0.0.1", 7000);
+        Socket socket = new SocketImpl(new java.net.Socket("127.0.0.1", 7000));
         //no need to read data as we're only checking connection event
-        Thread.currentThread().sleep(500);
+        Thread.sleep(500);
         IOUtil.closeSocket(socket);
         assertTrue(l.starting == true);
         assertTrue(l.established == true);
@@ -119,9 +120,9 @@ public class PerpetualSocketAcceptorTest extends TestCase {
         VetoedConnectionListener l = new VetoedConnectionListener();
         acceptor.aaccept(handler);
         acceptor.addConnectionListener(l);
-        Socket socket = new Socket("127.0.0.1", 7000);
+        Socket socket = new SocketImpl(new java.net.Socket("127.0.0.1", 7000));
         //no need to read data as we're only checking connection event
-        Thread.currentThread().sleep(500);
+        Thread.sleep(500);
         IOUtil.closeSocket(socket);
         assertTrue(l.starting == true);
         assertTrue(l.established == false);

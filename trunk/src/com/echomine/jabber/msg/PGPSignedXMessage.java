@@ -1,7 +1,5 @@
 package com.echomine.jabber.msg;
 
-import org.jdom.Element;
-import com.echomine.jabber.JabberJDOMMessage;
 import com.echomine.jabber.JabberCode;
 
 /**
@@ -12,25 +10,29 @@ import com.echomine.jabber.JabberCode;
  * <p>Signed messages are normally used for <presence/> messages.
  * The signing should use Status string of the Presence message, and signed
  * using the private key of the sender.</p>
- * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0027.html">JEP-0027 Version 0.2</a></b></p>
+ * <p/>
+ * <p>There are actually three types of PGP-signed messages and this only handles two types:
+ * <b>detached</b> and <b>clearsign</b>. If you have a copy of <a href="http://www.gnupg.org">Gnupg</a>
+ * you can create a detached PGP message with the command <code>gpg -ab filename</code>.
+ * A detched PGP message begins with a '-----BEGIN PGP SIGNATURE-----' header and ends with
+ * '-----END PGP SIGNATURE-----'. Using Gnupg you can create a clearsign PGP message with the
+ * command <code>gpg -clearsign filename</code>. Clearsign messages contain the same headers
+ * as a detached message but the also contain a leading '-----BEGIN PGP SIGNED MESSAGE-----'
+ * and a plaintext copy of the data that has been signed.</p>
+ * <p/>
+ * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0027.html">JEP-0027 Version 1.2</a></b></p>
  */
-public class PGPSignedXMessage extends JabberJDOMMessage {
-    /** constructs a default message */
-    public PGPSignedXMessage() {
-        super(new Element("x", JabberCode.XMLNS_X_PGP_SIGNED));
-    }
-
-    /** sets the PGP encrypted data to the specified data */
-    public void setPGPMessage(String data) {
-        getDOM().setText(data);
-    }
+public class PGPSignedXMessage extends AbstractPGPXMessage {
+    // clearsign messages are handled properly because all information leading up to PGP_HEADER is
+    // also stripped off in AbstractPGPXMessage. This has the effect of leaving you with a detached message.
+    private static final String PGP_HEADER = "-----BEGIN PGP SIGNATURE-----";
+    private static final String PGP_FOOTER = "-----END PGP SIGNATURE-----";
 
     /**
-     * retrieves the encrypted message
-     * @return the encrypted message or null if there is none.
+     * constructs a default message
      */
-    public String getPGPMessage() {
-        return getDOM().getText();
+    public PGPSignedXMessage() {
+        super(JabberCode.XMLNS_X_PGP_SIGNED, PGP_HEADER, PGP_FOOTER);
     }
 
     public int getMessageType() {

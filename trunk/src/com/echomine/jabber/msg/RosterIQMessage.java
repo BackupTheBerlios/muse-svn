@@ -16,31 +16,39 @@ import java.util.List;
  * contains a list of roster items.
  * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0093.html">JEP-0093 1.0</a></b></p>
  */
-public class RosterIQMessage extends JabberIQMessage {
+public class RosterIQMessage extends JabberIQMessage implements JabberCode {
     private static Log log = LogFactory.getLog(RosterIQMessage.class);
     private ArrayList rosterList;
 
-    /** this constructor is for creating outgoing messages. */
+    /**
+     * this constructor is for creating outgoing messages.
+     */
     public RosterIQMessage(String type) {
         super(type);
         //add in the query element
-        getDOM().addContent(new Element("query", JabberCode.XMLNS_IQ_ROSTER));
+        getDOM().addContent(new Element("query", XMLNS_IQ_ROSTER));
     }
 
-    /** defaults to iq type get */
+    /**
+     * defaults to iq type get
+     */
     public RosterIQMessage() {
         this(TYPE_GET);
     }
 
-    /** adds a roster item to the current roster message. This will add the item straight into the DOM. */
+    /**
+     * adds a roster item to the current roster message. This will add the item straight into the DOM.
+     */
     public void addRosterItem(RosterItem item) {
         //add it to our current DOM
-        getDOM().getChild("query", JabberCode.XMLNS_IQ_ROSTER).addContent(item.getDOM());
+        getDOM().getChild("query", XMLNS_IQ_ROSTER).addContent(item.getDOM());
     }
 
-    /** adds a list of roster items */
+    /**
+     * adds a list of roster items
+     */
     public void addRosterItems(List items) {
-        Element query = getDOM().getChild("query", JabberCode.XMLNS_IQ_ROSTER);
+        Element query = getDOM().getChild("query", XMLNS_IQ_ROSTER);
         Iterator iter = items.iterator();
         RosterItem item;
         while (iter.hasNext()) {
@@ -56,7 +64,7 @@ public class RosterIQMessage extends JabberIQMessage {
     public List getRosterItems() {
         if (rosterList != null) return rosterList;
         rosterList = new ArrayList();
-        Element query = getDOM().getChild("query", JabberCode.XMLNS_IQ_ROSTER);
+        Element query = getDOM().getChild("query", XMLNS_IQ_ROSTER);
         Iterator iter = query.getChildren().iterator();
         Element temp;
         RosterItem item;
@@ -75,6 +83,6 @@ public class RosterIQMessage extends JabberIQMessage {
     }
 
     public int getMessageType() {
-        return JabberCode.MSG_IQ_ROSTER;
+        return MSG_IQ_ROSTER;
     }
 }

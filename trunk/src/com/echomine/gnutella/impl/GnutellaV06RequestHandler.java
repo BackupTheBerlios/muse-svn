@@ -1,9 +1,9 @@
 package com.echomine.gnutella.impl;
 
+import alt.java.net.Socket;
 import com.echomine.gnutella.*;
 
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * this handler handles incoming Gnutella 0.6 connections.  Incoming gnutella handshaking is done here.
@@ -34,7 +34,7 @@ public class GnutellaV06RequestHandler implements ListenerRequestHandler {
         GnutellaConnectionModel cmodel = new GnutellaConnectionModel(socket.getInetAddress(), socket.getPort(), GnutellaConnectionModel.INCOMING);
         if (connectionList.isMaxIncomingReached())
             connection = new GnutellaAcceptorConnection(context, GnutellaProtocolType.PROTOCOL_BUSY_ACCEPTOR_V06, cmodel);
-        else if (context.getRestrictedHostCallback().isHostRestricted(socket.getInetAddress()))
+        else if (context.getRestrictedHostCallback() != null && context.getRestrictedHostCallback().isHostRestricted(socket.getInetAddress()))
             connection = new GnutellaAcceptorConnection(context, GnutellaProtocolType.PROTOCOL_REJECTED_ACCEPTOR_V06, cmodel);
         else
             connection = new GnutellaAcceptorConnection(context, GnutellaProtocolType.PROTOCOL_ACCEPTOR_V06, cmodel);

@@ -1,5 +1,6 @@
 package com.echomine.gnutella.impl;
 
+import alt.java.net.Socket;
 import com.echomine.gnutella.*;
 import com.echomine.net.ConnectionEvent;
 import com.echomine.net.ConnectionListener;
@@ -8,7 +9,6 @@ import com.echomine.util.HTTPResponseHeader;
 import org.apache.oro.text.perl.Perl5Util;
 
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * Handles all incoming GET requests.  Once a get request is obtained, the handler will make sure the file is shared.  If

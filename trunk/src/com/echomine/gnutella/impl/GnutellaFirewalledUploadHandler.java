@@ -1,5 +1,6 @@
 package com.echomine.gnutella.impl;
 
+import alt.java.net.Socket;
 import com.echomine.gnutella.GUID;
 import com.echomine.gnutella.GnutellaContext;
 import com.echomine.gnutella.GnutellaFileHandler;
@@ -18,7 +19,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.Socket;
 
 /**
  * Handles all firewalled uploads.  The file model is used a little differently from all the other file transfer handlers.  In

@@ -1,12 +1,13 @@
 package com.echomine.jabber.msg;
 
+import com.echomine.jabber.JabberCode;
+import com.echomine.jabber.JabberIQMessage;
+import org.jdom.Element;
+
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
-import org.jdom.Element;
-import com.echomine.jabber.JabberIQMessage;
-import com.echomine.jabber.JabberCode;
 
 /**
  * Submits and parses a Client Time message.  The message will return the time of the recipient that you sent the message to.
@@ -16,20 +17,24 @@ import com.echomine.jabber.JabberCode;
  * implement letting you set values.
  * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0090.html">JEP-0090 1.0</a></b></p>
  */
-public class TimeIQMessage extends JabberIQMessage {
+public class TimeIQMessage extends JabberIQMessage implements JabberCode {
     private String tz;
     private String disp;
     private String utc;
     private SimpleDateFormat format;
 
-    /** this constructor is for messages with type. */
+    /**
+     * this constructor is for messages with type.
+     */
     public TimeIQMessage(String type) {
         super(type);
         //add in the query element
-        getDOM().addContent(new Element("query", JabberCode.XMLNS_IQ_TIME));
+        getDOM().addContent(new Element("query", XMLNS_IQ_TIME));
     }
 
-    /** defaults to iq type get */
+    /**
+     * defaults to iq type get
+     */
     public TimeIQMessage() {
         this(TYPE_GET);
     }
@@ -53,21 +58,25 @@ public class TimeIQMessage extends JabberIQMessage {
         return date;
     }
 
-    /** return the UTC time string as returned by the client */
+    /**
+     * return the UTC time string as returned by the client
+     */
     public String getUTC() {
         if (utc != null) return utc;
-        Element query = getDOM().getChild("query", JabberCode.XMLNS_IQ_TIME);
+        Element query = getDOM().getChild("query", XMLNS_IQ_TIME);
         if (query != null)
-            utc = query.getChildText("utc", JabberCode.XMLNS_IQ_TIME);
+            utc = query.getChildText("utc", XMLNS_IQ_TIME);
         return utc;
     }
 
-    /** get the timezone that the client is in */
+    /**
+     * get the timezone that the client is in
+     */
     public String getTimeZone() {
         if (tz != null) return tz;
-        Element query = getDOM().getChild("query", JabberCode.XMLNS_IQ_TIME);
+        Element query = getDOM().getChild("query", XMLNS_IQ_TIME);
         if (query != null)
-            tz = query.getChildText("tz", JabberCode.XMLNS_IQ_TIME);
+            tz = query.getChildText("tz", XMLNS_IQ_TIME);
         return tz;
     }
 
@@ -78,13 +87,13 @@ public class TimeIQMessage extends JabberIQMessage {
     public String getDisplay() {
         if (disp != null) return disp;
         //retrieve the <display> tag
-        Element query = getDOM().getChild("query", JabberCode.XMLNS_IQ_TIME);
+        Element query = getDOM().getChild("query", XMLNS_IQ_TIME);
         if (query != null)
-            disp = query.getChildText("display", JabberCode.XMLNS_IQ_TIME);
+            disp = query.getChildText("display", XMLNS_IQ_TIME);
         return disp;
     }
 
     public int getMessageType() {
-        return JabberCode.MSG_IQ_TIME;
+        return MSG_IQ_TIME;
     }
 }

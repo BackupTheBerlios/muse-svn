@@ -1,13 +1,14 @@
 package com.echomine.gnutella.impl;
 
+import alt.java.net.Socket;
 import com.echomine.common.ParseException;
 import com.echomine.gnutella.*;
 import com.echomine.net.ConnectionModel;
 import com.echomine.net.ConnectionThrottler;
 import com.echomine.net.HandshakeFailedException;
 import com.echomine.util.HTTPHeader;
-import com.echomine.util.IOUtil;
 import com.echomine.util.HTTPResponseHeader;
+import com.echomine.util.IOUtil;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -15,7 +16,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.Socket;
 import java.util.Iterator;
 
 /**
@@ -235,16 +235,19 @@ abstract public class AbstractGnutellaProtocol implements GnutellaProtocolSocket
      */
     protected void logHandshakeHeaders() {
         if (hlogger.isInfoEnabled()) {
-            HTTPResponseHeader headers = (HTTPResponseHeader) getSupportedFeatureHeaders();
+            HTTPHeader headers = getSupportedFeatureHeaders();
             if (headers != null) {
-                hlogger.info(socket.getInetAddress().getHostAddress() + " Status: " + headers.getStatusMessage() + " (" + headers.getStatusCode() + ")");
+                if (headers instanceof HTTPResponseHeader) {
+                    HTTPResponseHeader respHeader = (HTTPResponseHeader) headers;
+                    hlogger.info(socket.getInetAddress().getHostAddress() + " Status: " + respHeader.getStatusMessage() + " (" + respHeader.getStatusCode() + ")");
+                }
                 if (hlogger.isDebugEnabled()) {
                     Iterator iter = headers.getHeaderNames().iterator();
                     String header, value;
                     while (iter.hasNext()) {
                         header = (String) iter.next();
                         value = headers.getHeader(header);
-                            hlogger.debug("Header " + header + ": " + value);
+                        hlogger.debug("Header " + header + ": " + value);
                     }
                 }
             }

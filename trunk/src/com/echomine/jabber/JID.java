@@ -102,4 +102,11 @@ public class JID {
         if (toString().equals(obj.toString())) return true;
         return false;
     }
+
+    /**
+     * Uses the full JID string as the hash code
+     */
+    public int hashCode() {
+        return toString().hashCode();
+    }
 }

@@ -1,11 +1,14 @@
 package com.echomine.jabber.msg;
 
+import com.echomine.common.ParseException;
 import com.echomine.jabber.DefaultMessageParser;
 import com.echomine.jabber.JabberCode;
+import com.echomine.jabber.JabberUtil;
 import com.echomine.xmlrpc.Call;
 import com.echomine.xmlrpc.Response;
 import com.echomine.xmlrpc.SerializerFactory;
 import junit.framework.TestCase;
+import org.jdom.Element;
 
 /**
  * Tests the XML RPC message to see if the call is outputting the proper XML
@@ -37,9 +40,40 @@ public class XMLRPCMessageTest extends TestCase {
         assertTrue(parser.supportsParsingFor("query", JabberCode.XMLNS_IQ_XMLRPC));
     }
 
-    /** tests message type compliance to make sure it is returning the proper type */
+    /**
+     * tests message type compliance to make sure it is returning the proper type
+     */
     public void testMessageType() {
         XMLRPCMessage msg = new XMLRPCMessage();
         assertEquals(JabberCode.MSG_IQ_XMLRPC, msg.getMessageType());
+    }
+
+    /**
+     * This test cases showcases a bug that happens when an incoming message is parsed
+     * and then toString is called.  The specific order of sequence that causes the problem
+     * is as follows:
+     * 1) parse incoming message
+     * 2) call toString() to show message
+     * 3) toString() consequently calls encode()
+     * 4) encode throws ParseException because call or response is always null during sanity check.
+     * <p/>
+     * The reason for this bug is because the parsing of the call/response object is done when
+     * the requested object is retrieved.  However, if the call/response did not get requested
+     * before someone decides to call toString() to output data, then things will not go as
+     * planned.
+     */
+    public void testEncodeParseExceptionAfterParse() throws Exception {
+        Call call = new Call("getHelloWorldString", factory);
+        XMLRPCMessage rpcMsg = new XMLRPCMessage(call);
+        String xml = rpcMsg.toString();
+        Element root = JabberUtil.parseXmlStringToDOM(xml);
+        rpcMsg = new XMLRPCMessage();
+        //simulate bug workflow
+        rpcMsg.parse(parser, root);
+        try {
+            rpcMsg.encode();
+        } catch (ParseException ex) {
+            fail("XMLRPCMessage should NOT throw ParseException when encode() is called right after parse()");
+        }
     }
 }

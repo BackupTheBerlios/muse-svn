@@ -1,9 +1,9 @@
 package com.echomine.gnutella.impl;
 
+import alt.java.net.Socket;
 import com.echomine.gnutella.*;
 
 import java.io.IOException;
-import java.net.Socket;
 
 /** this handler handles incoming Gnutella connections.  Incoming gnutella handshaking is done here. */
 public class GnutellaV04RequestHandler implements ListenerRequestHandler {

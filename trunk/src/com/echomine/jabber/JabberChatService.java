@@ -19,7 +19,7 @@ import com.echomine.common.SendMessageFailedException;
  * send messages with XHTML support.  If you require any advanced function, you should instantiate your own
  * JabberChatMessage, set the proper fields, and send the message yourself.</p>
  */
-public class JabberChatService {
+public class JabberChatService implements PresenceCode {
     private JabberSession session;
 
     public JabberChatService(JabberSession session) {
@@ -30,9 +30,10 @@ public class JabberChatService {
      * sends a private message to a specific JID that's plain text.  If you want to use HTML, you will
      * need to instantiate your own Chat Message and set the HTML body yourself.  Subject is not normally
      * needed since most other IMs don't use subjects.
+     *
      * @param toJID the JID to send the message to
-     * @param body the plain text body of the message
-     * @param wait true if the caller wants to wait until there is a reply to the message
+     * @param body  the plain text body of the message
+     * @param wait  true if the caller wants to wait until there is a reply to the message
      */
     public void sendPrivateMessage(JID toJID, String body, boolean wait) throws SendMessageFailedException {
         JabberChatMessage msg = new JabberChatMessage(JabberChatMessage.TYPE_CHAT);
@@ -45,10 +46,11 @@ public class JabberChatService {
     /**
      * replies to a message.  It is fairly simple in that it simply takes the From and ThreadID fields
      * from the original message and uses them to set the To and ThreadID of the reply message
-     * @param toJID the JID to send the message back to
+     *
+     * @param toJID    the JID to send the message back to
      * @param threadID the thread id of the originating message
-     * @param body the body text
-     * @param wait true if the caller wants to wait until there is a reply to the message
+     * @param body     the body text
+     * @param wait     true if the caller wants to wait until there is a reply to the message
      */
     public void replyToPrivateMessage(JID toJID, String threadID, String body, boolean wait) throws SendMessageFailedException {
         JabberChatMessage msg = new JabberChatMessage(JabberChatMessage.TYPE_CHAT);
@@ -64,9 +66,10 @@ public class JabberChatService {
      * joining chat rooms uses the old style of joining, not the new
      * conferencing style as it's not fully supported by Jabber Servers yet.
      * Any result from joining the room will be fired off as message events (which you should listen to).
+     *
      * @param roomJID the jid of the room, in the form of room@server
-     * @param nick the nickname to be used in the room
-     * @param wait true if the caller wants to wait until there is a reply to the message
+     * @param nick    the nickname to be used in the room
+     * @param wait    true if the caller wants to wait until there is a reply to the message
      */
     public void joinChatRoom(JID roomJID, String nick, boolean wait) throws SendMessageFailedException {
         JabberPresenceMessage msg = new JabberPresenceMessage();
@@ -79,11 +82,12 @@ public class JabberChatService {
     /**
      * leaves a chat room that you are currently in.  When you leave, you will received an
      * unavailable presence that is sent from the room JID.
+     *
      * @param roomJID the JID of the room to leave
-     * @param wait true if the caller wants to wait until there is a reply to the message
+     * @param wait    true if the caller wants to wait until there is a reply to the message
      */
     public void leaveChatRoom(JID roomJID, boolean wait) throws SendMessageFailedException {
-        JabberPresenceMessage msg = new JabberPresenceMessage(PresenceCode.TYPE_UNAVAILABLE);
+        JabberPresenceMessage msg = new JabberPresenceMessage(TYPE_UNAVAILABLE);
         msg.setTo(roomJID);
         msg.setSynchronized(wait);
         session.sendMessage(msg);
@@ -92,9 +96,10 @@ public class JabberChatService {
     /**
      * a simple method to send a text message to the chat room.  If you want to send XHTML
      * text, you will have to instantiate your own Chat Message.
+     *
      * @param roomJID the JID of the chat room
-     * @param body the text to send to the chat room
-     * @param wait true if the caller wants to wait until there is a reply to the message
+     * @param body    the text to send to the chat room
+     * @param wait    true if the caller wants to wait until there is a reply to the message
      */
     public void sendChatMessage(JID roomJID, String body, boolean wait) throws SendMessageFailedException {
         JabberChatMessage msg = new JabberChatMessage(JabberChatMessage.TYPE_GROUPCHAT);
@@ -109,13 +114,14 @@ public class JabberChatService {
      * Use this to set your status as either away, extended away, etc.  To set back to available,
      * simply set show state and status to null and you will be set back to available.  The priority
      * is set to default 0.
-     * @param roomJID the JID of the room to send the availability to
+     *
+     * @param roomJID   the JID of the room to send the availability to
      * @param showState optional parameter to set the show state (chat, away, extended away, etc), null if not setting a state
-     * @param status the status to set, or null if not setting a status text
-     * @param wait true if the caller wants to wait until there is a reply to the message
+     * @param status    the status to set, or null if not setting a status text
+     * @param wait      true if the caller wants to wait until there is a reply to the message
      */
     public void setChatAvailable(JID roomJID, String showState, String status, boolean wait) throws SendMessageFailedException {
-        JabberPresenceMessage msg = new JabberPresenceMessage(PresenceCode.TYPE_AVAILABLE);
+        JabberPresenceMessage msg = new JabberPresenceMessage(TYPE_AVAILABLE);
         msg.setTo(roomJID);
         msg.setSynchronized(wait);
         if (showState != null)

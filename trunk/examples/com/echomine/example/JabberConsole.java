@@ -1,8 +1,8 @@
 package com.echomine.example;
 
 import com.echomine.jabber.*;
-import com.echomine.net.ConnectionListener;
 import com.echomine.net.ConnectionEvent;
+import com.echomine.net.ConnectionListener;
 import com.echomine.net.ConnectionVetoException;
 
 import java.io.BufferedReader;
@@ -19,30 +19,37 @@ public class JabberConsole {
     private String username;
     private String password;
     private String serverName;
-    private int port = 5222;
+    private int port = JabberContext.DEFAULT_PORT;
     private JabberContext context;
     private Jabber jabber;
+    private boolean ssl = false;
 
-    public JabberConsole(String username, String password, String server) {
+    public JabberConsole(String username, String password, String server, boolean ssl) {
         this.username = username;
         this.password = password;
         this.serverName = server;
+        this.ssl = ssl;
     }
 
     protected void setUp() {
         context = new JabberContext(username, password, serverName);
+        context.setSSL(ssl);
+        if (ssl) port = JabberContext.DEFAULT_SSL_PORT;
         jabber = new Jabber();
     }
 
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.out.println("Usage: JabberConsole <username> <password> [<jabber server>]");
+            System.out.println("Usage: JabberConsole <username> <password> [<jabber server>] [<ssl{true/false}>]");
             System.exit(1);
         }
         String server = "jabber.org";
-        if (args.length == 3)
+        boolean ssl = false;
+        if (args.length >= 3)
             server = args[2];
-        JabberConsole console = new JabberConsole(args[0], args[1], server);
+        if (args.length == 4)
+            ssl = Boolean.valueOf(args[3]).booleanValue();
+        JabberConsole console = new JabberConsole(args[0], args[1], server, ssl);
         console.setUp();
         console.runConsole();
     }

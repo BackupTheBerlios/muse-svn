@@ -1,19 +1,17 @@
 package com.echomine.jabber;
 
 import com.echomine.common.ParseException;
-import com.echomine.jabber.msg.EventXMessage;
 import com.echomine.jabber.msg.DelayXMessage;
+import com.echomine.jabber.msg.EventXMessage;
 import com.echomine.jabber.msg.PGPEncryptedXMessage;
 import com.echomine.jabber.msg.RosterXMessage;
-
-import java.io.StringReader;
-import java.io.IOException;
-import java.util.List;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * <p>This is the base message for working with private IM messages, group chats, and anything that is sent
@@ -30,7 +28,7 @@ import org.jdom.output.XMLOutputter;
  * automatically set the Thread ID to a new GUID for you so you don't need to worry about that part.  But that's
  * only for new messages.</p>
  */
-public class JabberChatMessage extends AbstractJabberMessage {
+public class JabberChatMessage extends AbstractJabberMessage implements JabberCode {
     public final static String TYPE_NORMAL = "normal";
     public final static String TYPE_CHAT = "chat";
     public final static String TYPE_GROUPCHAT = "groupchat";
@@ -40,14 +38,18 @@ public class JabberChatMessage extends AbstractJabberMessage {
     private String subject;
     private String threadID;
 
-    /** Normally used for creating an outgoing message */
+    /**
+     * Normally used for creating an outgoing message
+     */
     public JabberChatMessage(String type) {
-        super(type, new Element("message", JabberCode.XMLNS_CHAT));
+        super(type, new Element("message", XMLNS_CHAT));
         //set new thread id
         setThreadID(generateThreadID());
     }
 
-    /** defaults the message type to a normal type */
+    /**
+     * defaults the message type to a normal type
+     */
     public JabberChatMessage() {
         this(TYPE_NORMAL);
     }
@@ -57,23 +59,28 @@ public class JabberChatMessage extends AbstractJabberMessage {
         super.parse(parser, msgTree);
         if (getType() == null)
             setType(TYPE_NORMAL);
+        threadID = msgTree.getChildText("thread", XMLNS_CHAT);
         return this;
     }
 
-    /** retrieves the message body */
+    /**
+     * retrieves the message body
+     */
     public String getBody() {
         if (body != null) return body;
-        body = getDOM().getChildText("body", JabberCode.XMLNS_CHAT);
+        body = getDOM().getChildText("body", XMLNS_CHAT);
         return body;
     }
 
-    /** sets the outgoing message body */
+    /**
+     * sets the outgoing message body
+     */
     public void setBody(String body) {
         this.body = body;
         //removes the child if there is one
-        getDOM().removeChild("body", JabberCode.XMLNS_CHAT);
+        getDOM().removeChild("body", XMLNS_CHAT);
         if (body != null) {
-            Element temp = new Element("body", JabberCode.XMLNS_CHAT);
+            Element temp = new Element("body", XMLNS_CHAT);
             temp.setText(body);
             getDOM().addContent(temp);
         }
@@ -115,10 +122,12 @@ public class JabberChatMessage extends AbstractJabberMessage {
         }
     }
 
-    /** retrieves the message subject */
+    /**
+     * retrieves the message subject
+     */
     public String getSubject() {
         if (subject != null) return subject;
-        subject = getDOM().getChildText("subject", JabberCode.XMLNS_CHAT);
+        subject = getDOM().getChildText("subject", XMLNS_CHAT);
         return subject;
     }
 
@@ -128,9 +137,9 @@ public class JabberChatMessage extends AbstractJabberMessage {
      */
     public void setSubject(String subject) {
         this.subject = subject;
-        getDOM().removeChild("subject", JabberCode.XMLNS_CHAT);
+        getDOM().removeChild("subject", XMLNS_CHAT);
         if (subject != null) {
-            Element temp = new Element("subject", JabberCode.XMLNS_CHAT);
+            Element temp = new Element("subject", XMLNS_CHAT);
             temp.setText(subject);
             getDOM().addContent(temp);
         }
@@ -138,20 +147,22 @@ public class JabberChatMessage extends AbstractJabberMessage {
 
     /**
      * retrieve the thread id associated with this message.  It's used to associate different
-     * messages so you know which message is going with which conversation.
+     * messages so you know which message is going with which conversation.  Since the Thread ID
+     * is already parsed in the parse() method, we have no need to retrieve the data again
+     * from the DOM.
      */
     public String getThreadID() {
-        if (threadID != null) return threadID;
-        threadID = getDOM().getChildText("thread", JabberCode.XMLNS_CHAT);
         return threadID;
     }
 
-    /** sets the thread id.  Set to null to remove the thread ID from getting sent with the message */
+    /**
+     * sets the thread id.  Set to null to remove the thread ID from getting sent with the message
+     */
     public void setThreadID(String threadID) {
         this.threadID = threadID;
-        getDOM().removeChild("thread", JabberCode.XMLNS_CHAT);
+        getDOM().removeChild("thread", XMLNS_CHAT);
         if (threadID != null) {
-            Element temp = new Element("thread", JabberCode.XMLNS_CHAT);
+            Element temp = new Element("thread", XMLNS_CHAT);
             temp.setText(threadID);
             getDOM().addContent(temp);
         }
@@ -161,46 +172,51 @@ public class JabberChatMessage extends AbstractJabberMessage {
      * checks to see if this message contains a jabber:x:roster message. If it does,
      * then this message is marked as a message that is sending a list of roster
      * contacts over to someone (either someone sending contacts to you or you sending contacts to someone else).
+     *
      * @return true if this message contains roster contacts, false otherwise.
      */
     public boolean isRosterMessage() {
-        JabberMessage msg = getXMessage(JabberCode.XMLNS_X_ROSTER.getURI());
+        JabberMessage msg = getXMessage(XMLNS_X_ROSTER.getURI());
         if (msg == null) return false;
         return true;
     }
 
     /**
      * retrieves a list of RosterItem's contained in this message if there are any. If not, then the method returns null.
+     *
      * @return List of RosterItem objects, null if there is no list
      */
     public List getRosterList() {
-        RosterXMessage msg = (RosterXMessage)getXMessage(JabberCode.XMLNS_X_ROSTER.getURI());
+        RosterXMessage msg = (RosterXMessage) getXMessage(XMLNS_X_ROSTER.getURI());
         if (msg == null) return null;
         return msg.getRosterItems();
     }
 
     /**
      * retrieves the event message if there is one associated with it
+     *
      * @return the event message, null if none exists
      */
     public EventXMessage getEventMessage() {
-        return (EventXMessage)getXMessage(JabberCode.XMLNS_X_EVENT.getURI());
+        return (EventXMessage) getXMessage(XMLNS_X_EVENT.getURI());
     }
 
     /**
      * convenience method to retrieve the Delay X Message (you can get the message by calling getXMessage() as well)
+     *
      * @return the delay message, null if none exists
      */
     public DelayXMessage getDelayMessage() {
-        return (DelayXMessage)getXMessage(JabberCode.XMLNS_X_DELAY.getURI());
+        return (DelayXMessage) getXMessage(XMLNS_X_DELAY.getURI());
     }
 
     /**
      * a convenience method to retrieve the PGP encrypted data if there is one attached to this message
+     *
      * @return the PGP Encrypted X Message or null if there isn't one attached to this message
      */
     public PGPEncryptedXMessage getPGPMessage() {
-        return (PGPEncryptedXMessage)getXMessage(JabberCode.XMLNS_X_PGP_ENCRYPTED.getURI());
+        return (PGPEncryptedXMessage) getXMessage(XMLNS_X_PGP_ENCRYPTED.getURI());
     }
 
     /**
@@ -212,7 +228,7 @@ public class JabberChatMessage extends AbstractJabberMessage {
     }
 
     public int getMessageType() {
-        return JabberCode.MSG_CHAT;
+        return MSG_CHAT;
     }
 
     /*    public String toString() {

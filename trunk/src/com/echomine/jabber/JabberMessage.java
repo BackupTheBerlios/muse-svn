@@ -39,7 +39,7 @@ import java.util.HashMap;
  */
 abstract public class JabberMessage {
     private JabberMessage replymsg;
-    private String messageID;
+    protected String messageID;
     private boolean replyRequired = false;
     private boolean sync = false;
     //default 30 seconds
@@ -52,7 +52,9 @@ abstract public class JabberMessage {
         messageID = MessageID.nextID();
     }
 
-    /** the method will wake and interrupt all the waiting threads due to some sort of shutdown request or something */
+    /**
+     * the method will wake and interrupt all the waiting threads due to some sort of shutdown request or something
+     */
     public void interrupt() {
         if (sync) {
             synchronized (this) {
@@ -63,6 +65,7 @@ abstract public class JabberMessage {
 
     /**
      * sets the timeout for this message when waiting for reply.  The default is 30 seconds.
+     *
      * @param ms timeout in milliseconds. 0 to disable timeout and wait forever.
      */
     public void setTimeout(long ms) {
@@ -75,13 +78,16 @@ abstract public class JabberMessage {
 
     /**
      * check if this message requires waiting for a reply.
+     *
      * @return true if message requires waiting for a reply, false otherwise.
      */
     public boolean isReplyRequired() {
         return replyRequired;
     }
 
-    /** @return true if message is synchronized */
+    /**
+     * @return true if message is synchronized
+     */
     public boolean isSynchronized() {
         return sync;
     }
@@ -98,6 +104,7 @@ abstract public class JabberMessage {
 
     /**
      * retrieves the reply message associated with this message, if any.
+     *
      * @return the reply message or null if no reply exists
      */
     public JabberMessage getReplyMessage() {
@@ -118,6 +125,7 @@ abstract public class JabberMessage {
      * sets the message to require waiting for a reply or not. Requiring a reply does not
      * necessarily mean it has to be synchronized.  It just means that this message is
      * expecting a reply and will have certain methods called to work with replies.
+     *
      * @param replyRequired true if message needs to wait for a reply, false otherwise.
      */
     public void setReplyRequired(boolean replyRequired) {
@@ -163,6 +171,7 @@ abstract public class JabberMessage {
     /**
      * Retrieves the name/value pairs of the X Messages.  Note that the returned instance is not a copy.
      * Thus, if you make any changes to the Hashtable, it will reflect in the message.
+     *
      * @return a list of all the messages, null if no messages exists
      */
     public HashMap getXMessages() {
@@ -171,6 +180,7 @@ abstract public class JabberMessage {
 
     /**
      * retrieves an "x" message with the specified namespace string (ie. "jabber:x:oob")
+     *
      * @return the jabber message if one exists, null otherwise
      */
     public JabberMessage getXMessage(String ns) {
@@ -200,13 +210,16 @@ abstract public class JabberMessage {
 
     /**
      * enable or disabled sending of the X Messages
+     *
      * @param sendXMsgs true to send X Messages, false otherwise
      */
     public void setSendXMessages(boolean sendXMsgs) {
         this.sendXMsgs = sendXMsgs;
     }
 
-    /** returns whether to send X Messages or not */
+    /**
+     * returns whether to send X Messages or not
+     */
     public boolean isSendXMessages() {
         return sendXMsgs;
     }
@@ -215,6 +228,7 @@ abstract public class JabberMessage {
      * This method will indicate what type of message it is.  Currently, the unique way to identify a message
      * is through an arbitrarily assigned int that's listed in JabberCode.  By comparing the message type, you can then filter
      * out the exact type of message you're looking for.
+     *
      * @return a message code that is unique to the message
      * @see com.echomine.jabber.JabberCode
      */
@@ -223,7 +237,9 @@ abstract public class JabberMessage {
     /**
      * encodes the data into an XML string that is ready to be sent out to the network.
      * This method is only used for outgoing messages.
-     * @throws com.echomine.common.ParseException if something went wrong during encoding
+     *
+     * @throws com.echomine.common.ParseException
+     *          if something went wrong during encoding
      */
     public abstract String encode() throws ParseException;
 }

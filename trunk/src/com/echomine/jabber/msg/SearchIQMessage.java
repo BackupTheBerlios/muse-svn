@@ -28,9 +28,10 @@ import java.util.List;
  * or limiting the number of "hits".
  * TODO: addFields, addField, getFields are similar to RegisterIQMessage.  Should refactor when get a chance.
  * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0055.html">JEP-0055 Version 1.0</a></b></p>
+ *
  * @since 0.8a4
  */
-public class SearchIQMessage extends JabberIQMessage {
+public class SearchIQMessage extends JabberIQMessage implements JabberCode {
     private static Log log = LogFactory.getLog(SearchIQMessage.class);
 
     /**
@@ -40,10 +41,12 @@ public class SearchIQMessage extends JabberIQMessage {
      */
     public SearchIQMessage(String type) {
         super(type);
-        getDOM().addContent(new Element("query", JabberCode.XMLNS_IQ_SEARCH));
+        getDOM().addContent(new Element("query", XMLNS_IQ_SEARCH));
     }
 
-    /** sets the default to be of iq type "get" */
+    /**
+     * sets the default to be of iq type "get"
+     */
     public SearchIQMessage() {
         this(TYPE_GET);
     }
@@ -52,29 +55,32 @@ public class SearchIQMessage extends JabberIQMessage {
      * normally used to add fields that should be sent to the server when registering a new account
      * or updating a current one.  You could update the fields that you want.  If this is a new account
      * message, you should definitely include the username and password in here.
-     * @param name the name of the field
+     *
+     * @param name  the name of the field
      * @param value the value that is associated with the name
      */
     public void addField(String name, String value) {
-        Element query = getDOM().getChild("query", JabberCode.XMLNS_IQ_SEARCH);
+        Element query = getDOM().getChild("query", XMLNS_IQ_SEARCH);
         //query should definitely exist
-        Element field = new Element(name, JabberCode.XMLNS_IQ_SEARCH);
+        Element field = new Element(name, XMLNS_IQ_SEARCH);
         if (value != null)
             field.setText(value);
         query.addContent(field);
     }
 
-    /** this method allows you to add multiple fields at once.  The hashtable contains strings for names and values. */
+    /**
+     * this method allows you to add multiple fields at once.  The hashtable contains strings for names and values.
+     */
     public void addFields(HashMap fields) {
         Iterator iter = fields.keySet().iterator();
         if (!iter.hasNext()) return;
-        Element query = getDOM().getChild("query", JabberCode.XMLNS_IQ_SEARCH);
+        Element query = getDOM().getChild("query", XMLNS_IQ_SEARCH);
         String name, value;
         Element field;
         do {
             name = (String) iter.next();
             value = (String) fields.get(name);
-            field = new Element(name, JabberCode.XMLNS_IQ_SEARCH);
+            field = new Element(name, XMLNS_IQ_SEARCH);
             if (value != null)
                 field.setText(value);
             query.addContent(field);
@@ -83,12 +89,13 @@ public class SearchIQMessage extends JabberIQMessage {
 
     /**
      * this is used normally for incoming messages to retrieve the fields that are returned.
+     *
      * @return hash map of name/value string pairs that contain the information inside the message.
      */
     public HashMap getFields() {
         HashMap fields = new HashMap();
         //obtain the dom
-        Element query = getDOM().getChild("query", JabberCode.XMLNS_IQ_SEARCH);
+        Element query = getDOM().getChild("query", XMLNS_IQ_SEARCH);
         Iterator iter = query.getChildren().iterator();
         String name, value;
         Element field;
@@ -104,14 +111,16 @@ public class SearchIQMessage extends JabberIQMessage {
     /**
      * retrieves the list of search result items if there are any.  If none exists, then an empty list
      * will be returned.
+     *
      * @return the list of SearchItem objects, empty if none exists.
-     * @throws java.lang.IllegalStateException if the message type is not a result type
+     * @throws java.lang.IllegalStateException
+     *          if the message type is not a result type
      */
     public List getResultItems() {
         if (!TYPE_RESULT.equals(getType()))
             throw new IllegalStateException("This method can only be called when the message type is a result type");
         ArrayList list = new ArrayList();
-        Namespace ns = JabberCode.XMLNS_IQ_SEARCH;
+        Namespace ns = XMLNS_IQ_SEARCH;
         Element query = getDOM().getChild("query", ns);
         Iterator iter = query.getChildren("item", ns).iterator();
         Element elem;
@@ -130,6 +139,6 @@ public class SearchIQMessage extends JabberIQMessage {
     }
 
     public int getMessageType() {
-        return JabberCode.MSG_IQ_SEARCH;
+        return MSG_IQ_SEARCH;
     }
 }

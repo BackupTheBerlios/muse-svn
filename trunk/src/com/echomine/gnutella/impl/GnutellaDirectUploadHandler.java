@@ -1,5 +1,6 @@
 package com.echomine.gnutella.impl;
 
+import alt.java.net.Socket;
 import com.echomine.gnutella.GnutellaContext;
 import com.echomine.gnutella.GnutellaFileHandler;
 import com.echomine.gnutella.GnutellaFileModel;
@@ -16,7 +17,6 @@ import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.net.Socket;
 
 /**
  * Handles all direct uploads.  The first GET request line is already parsed by the GetRequestHandler and the information is

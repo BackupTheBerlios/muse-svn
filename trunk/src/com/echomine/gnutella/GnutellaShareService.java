@@ -1,5 +1,6 @@
 package com.echomine.gnutella;
 
+import alt.java.net.Socket;
 import com.echomine.common.SendMessageFailedException;
 import com.echomine.gnutella.impl.GetRequestHandler;
 import com.echomine.gnutella.impl.GnutellaFirewalledUploadHandler;
@@ -7,7 +8,6 @@ import com.echomine.net.*;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.Socket;
 import java.util.Collection;
 import java.util.Iterator;
 

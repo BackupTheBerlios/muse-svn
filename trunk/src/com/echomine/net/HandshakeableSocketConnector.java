@@ -1,9 +1,10 @@
 package com.echomine.net;
 
+import alt.java.net.Socket;
+import alt.java.net.SocketImpl;
 import com.echomine.util.IOUtil;
 
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * <p>This class works similar to SocketConnector to add in handshaking capability.
@@ -44,7 +45,7 @@ public class HandshakeableSocketConnector extends TimeableConnection {
             ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
             socketHandler.start();
             fireConnectionStarting(event, vetoEvent);
-            Socket socket = new Socket(connectionModel.getHost(), connectionModel.getPort());
+            Socket socket = new SocketImpl(new java.net.Socket(connectionModel.getHost(), connectionModel.getPort()));
             try {
                 event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
                 socketHandler.handshake(socket);
@@ -89,39 +90,39 @@ public class HandshakeableSocketConnector extends TimeableConnection {
      */
     public void aconnect(final HandshakeableSocketHandler socketHandler, final ConnectionModel connectionModel) {
         Thread thread = new Thread(
-            new Runnable() {
-                public void run() {
-                    try {
-                        ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
-                        ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
-                        socketHandler.start();
-                        fireConnectionStarting(event, vetoEvent);
-                        Socket socket = new Socket(connectionModel.getHost(), connectionModel.getPort());
+                new Runnable() {
+                    public void run() {
                         try {
-                            event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
-                            socketHandler.handshake(socket);
-                            fireConnectionEstablished(event);
-                            socketHandler.handle(socket);
-                            event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_CLOSED);
-                            fireConnectionClosed(event);
-                        } catch (HandshakeFailedException ex) {
-                            event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error during handshaking: " + ex.getMessage());
-                            fireConnectionClosed(event);
+                            ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
+                            ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
+                            socketHandler.start();
+                            fireConnectionStarting(event, vetoEvent);
+                            Socket socket = new SocketImpl(new java.net.Socket(connectionModel.getHost(), connectionModel.getPort()));
+                            try {
+                                event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
+                                socketHandler.handshake(socket);
+                                fireConnectionEstablished(event);
+                                socketHandler.handle(socket);
+                                event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_CLOSED);
+                                fireConnectionClosed(event);
+                            } catch (HandshakeFailedException ex) {
+                                event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error during handshaking: " + ex.getMessage());
+                                fireConnectionClosed(event);
+                            } catch (IOException ex) {
+                                event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error while handling connection: " + ex.getMessage());
+                                fireConnectionClosed(event);
+                            } finally {
+                                IOUtil.closeSocket(socket);
+                            }
                         } catch (IOException ex) {
-                            event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error while handling connection: " + ex.getMessage());
+                            //error connecting
+                            ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error connecting to host: " + ex.getMessage());
                             fireConnectionClosed(event);
-                        } finally {
-                            IOUtil.closeSocket(socket);
+                        } catch (ConnectionVetoException ex) {
+                            //do nothing, connection closed event already fired
                         }
-                    } catch (IOException ex) {
-                        //error connecting
-                        ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error connecting to host: " + ex.getMessage());
-                        fireConnectionClosed(event);
-                    } catch (ConnectionVetoException ex) {
-                        //do nothing, connection closed event already fired
                     }
-                }
-            });
+                });
         thread.start();
     }
 

@@ -1,6 +1,6 @@
 package com.echomine.net;
 
-import java.net.Socket;
+import alt.java.net.Socket;
 
 /**
  * This interface adds an additional handshake method to the socket handler

@@ -1,7 +1,8 @@
 package com.echomine.gnutella;
 
+import alt.java.net.Socket;
+
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * Implementors of this interface will be handling the main bulk of the request.  Once the process is handled it essentially

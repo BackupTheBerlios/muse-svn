@@ -1,8 +1,8 @@
 package com.echomine.jabber.msg;
 
 import com.echomine.common.ParseException;
-import com.echomine.jabber.JabberIQMessage;
 import com.echomine.jabber.JabberCode;
+import com.echomine.jabber.JabberIQMessage;
 import com.echomine.jabber.JabberMessage;
 import com.echomine.jabber.JabberMessageParser;
 import org.jdom.Element;
@@ -17,18 +17,22 @@ import org.jdom.Element;
  * current protocol specification.</p>
  * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0012.html">JEP-0012 Version 1.0</a></b></p>
  */
-public class LastIQMessage extends JabberIQMessage {
+public class LastIQMessage extends JabberIQMessage implements JabberCode {
     private long seconds;
     private String msg;
 
-    /** this constructor is for messages with type. */
+    /**
+     * this constructor is for messages with type.
+     */
     public LastIQMessage(String type) {
         super(type);
         //add in the query element
-        getDOM().addContent(new Element("query", JabberCode.XMLNS_IQ_LAST));
+        getDOM().addContent(new Element("query", XMLNS_IQ_LAST));
     }
 
-    /** defaults to iq type get */
+    /**
+     * defaults to iq type get
+     */
     public LastIQMessage() {
         this(TYPE_GET);
     }
@@ -37,11 +41,11 @@ public class LastIQMessage extends JabberIQMessage {
         //let the parent class parse out the normal core attributes
         super.parse(parser, msgTree);
         //parse out the iq message data
-        Element query = msgTree.getChild("query", JabberCode.XMLNS_IQ_LAST);
+        Element query = msgTree.getChild("query", XMLNS_IQ_LAST);
         //check to make sure that there is a query tag
         if (query != null) {
-            String secs = msgTree.getChild("query", JabberCode.XMLNS_IQ_LAST).getAttributeValue("seconds");
-            msg = msgTree.getChildText("query", JabberCode.XMLNS_IQ_LAST);
+            String secs = msgTree.getChild("query", XMLNS_IQ_LAST).getAttributeValue("seconds");
+            msg = msgTree.getChildText("query", XMLNS_IQ_LAST);
             if (secs != null)
                 seconds = Long.parseLong(secs);
         }
@@ -50,6 +54,7 @@ public class LastIQMessage extends JabberIQMessage {
 
     /**
      * Retrieves how long ago a user logged out
+     *
      * @return the time in seconds
      */
     public long getSeconds() {
@@ -58,6 +63,7 @@ public class LastIQMessage extends JabberIQMessage {
 
     /**
      * retrieve the message (ie. last available message) if there is one.
+     *
      * @return the "last" message, or null if there isn't one
      */
     public String getMessage() {
@@ -70,10 +76,10 @@ public class LastIQMessage extends JabberIQMessage {
      */
     public void setSeconds(long seconds) {
         this.seconds = seconds;
-        getDOM().getChild("query", JabberCode.XMLNS_IQ_LAST).setAttribute("seconds", String.valueOf(seconds));
+        getDOM().getChild("query", XMLNS_IQ_LAST).setAttribute("seconds", String.valueOf(seconds));
     }
 
     public int getMessageType() {
-        return JabberCode.MSG_IQ_LAST;
+        return MSG_IQ_LAST;
     }
 }

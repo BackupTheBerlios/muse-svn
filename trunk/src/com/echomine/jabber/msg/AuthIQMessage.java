@@ -1,15 +1,15 @@
 package com.echomine.jabber.msg;
 
-import com.echomine.util.HexDec;
-import com.echomine.jabber.JabberIQMessage;
 import com.echomine.jabber.JabberCode;
 import com.echomine.jabber.JabberContext;
+import com.echomine.jabber.JabberIQMessage;
+import com.echomine.util.HexDec;
+import org.jdom.Element;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Iterator;
-import org.jdom.Element;
 
 /**
  * This message object deals with all the workings of sending and receiving authentication messages.
@@ -18,7 +18,7 @@ import org.jdom.Element;
  * of the outgoing message.  Incoming auth message is not synchronized by default since incoming message
  * normally won't get sent out again.
  */
-public class AuthIQMessage extends JabberIQMessage {
+public class AuthIQMessage extends JabberIQMessage implements JabberCode {
     public final static int AUTH_CLEARTEXT = 1;
     public final static int AUTH_DIGEST = 2;
     public final static int AUTH_ZERO_KNOWLEDGE = 3;
@@ -36,10 +36,12 @@ public class AuthIQMessage extends JabberIQMessage {
     public AuthIQMessage(String type) {
         super(type);
         setSynchronized(true);
-        getDOM().addContent(new Element("query", JabberCode.XMLNS_IQ_AUTH));
+        getDOM().addContent(new Element("query", XMLNS_IQ_AUTH));
     }
 
-    /** this constructor is used for incoming iq:auth messages. Outgoing messages should use the static methods instead. */
+    /**
+     * this constructor is used for incoming iq:auth messages. Outgoing messages should use the static methods instead.
+     */
     public AuthIQMessage() {
         this(TYPE_GET);
     }
@@ -50,6 +52,7 @@ public class AuthIQMessage extends JabberIQMessage {
      * received a reply.  If this did not occur, then calling this method will return the least
      * secure authentication method by default.  Thus, it is wise that you create and send this
      * message first before using this message.
+     *
      * @return the most secure authentication method that can be used by this server
      */
     public int getMostSecureAuth() {
@@ -60,15 +63,15 @@ public class AuthIQMessage extends JabberIQMessage {
         if (getReplyMessage() == null)
             return AUTH_CLEARTEXT;
         //parse the reply message
-        AuthIQMessage reply = (AuthIQMessage)getReplyMessage();
+        AuthIQMessage reply = (AuthIQMessage) getReplyMessage();
         //get the DOM
         Element elem = reply.getDOM();
         //parse the internal elements and put them into a temporary hash table
         HashMap authMethods = new HashMap();
-        Iterator iter = elem.getChild("query", JabberCode.XMLNS_IQ_AUTH).getChildren().iterator();
+        Iterator iter = elem.getChild("query", XMLNS_IQ_AUTH).getChildren().iterator();
         Element authMethod;
         while (iter.hasNext()) {
-            authMethod = (Element)iter.next();
+            authMethod = (Element) iter.next();
             //add it to the hash
             authMethods.put(authMethod.getName(), authMethod.getText());
         }
@@ -79,8 +82,8 @@ public class AuthIQMessage extends JabberIQMessage {
             mostSecureAuth = AUTH_CLEARTEXT;
         // now check if zero knowledge authentication is possible
         if (authMethods.containsKey("token") && authMethods.containsKey("sequence")) {
-            String token = (String)authMethods.get("token");
-            String sequence = (String)authMethods.get("sequence");
+            String token = (String) authMethods.get("token");
+            String sequence = (String) authMethods.get("sequence");
             //make sure both are not null and sequence is parseable into an integer
             if (token == null || sequence == null) return mostSecureAuth;
             try {
@@ -100,6 +103,7 @@ public class AuthIQMessage extends JabberIQMessage {
     /**
      * This method checks to see which is the most secure authentication method first,
      * and based on that, return the password for that authentication method.
+     *
      * @return the password for the most secure authentication method
      */
     public String getPassword(JabberContext context, int authType) {
@@ -120,7 +124,9 @@ public class AuthIQMessage extends JabberIQMessage {
         return mostSecurePassword;
     }
 
-    /** @return the cleartext password */
+    /**
+     * @return the cleartext password
+     */
     protected String getCleartextPassword(JabberContext context) {
         return context.getPassword();
     }
@@ -128,6 +134,7 @@ public class AuthIQMessage extends JabberIQMessage {
     /**
      * The way a digest password is computed is as follows. Append the password to the Session ID (sent by the server), and
      * then run it through a SHA1 hash algorithm.  Then return the HEX representation of the hash.
+     *
      * @return the digest password
      */
     protected String getDigestPassword(JabberContext context) {
@@ -157,6 +164,7 @@ public class AuthIQMessage extends JabberIQMessage {
      * and performs an additional hash to result in hash462, and compares it to the stored hash
      * for that sequence#. If they match, store the hash461 from the now authenticated client
      * as the new hash and reduce the sequence#. <b>This feature is not supported</b>
+     *
      * @return the zero-knowledge password
      */
     protected String getZeroKnowledgePassword(JabberContext context, String zerokToken, int zerokSeq) {
@@ -197,8 +205,8 @@ public class AuthIQMessage extends JabberIQMessage {
         Element elem = authMsg.getDOM();
         //the dom structure for a get auth message is as follows
         //<query xmlns="jabber:iq:auth"><username/></query>
-        Element query = elem.getChild("query", JabberCode.XMLNS_IQ_AUTH);
-        Element username = new Element("username", JabberCode.XMLNS_IQ_AUTH);
+        Element query = elem.getChild("query", XMLNS_IQ_AUTH);
+        Element username = new Element("username", XMLNS_IQ_AUTH);
         username.setText(context.getUsername());
         query.addContent(username);
         return authMsg;
@@ -210,10 +218,11 @@ public class AuthIQMessage extends JabberIQMessage {
      * Authentication will also support anonymous resource if you set the username and password both to null.
      * If authentication is zero-knowledge authentication, you must provide the Token and the Sequence.
      * Otherwise, you can pass in null for the values.
-     * @param context the context that will contains the login information
-     * @param authType the authentication type that will be used to login (valid types are listed in this class as constants)
+     *
+     * @param context    the context that will contains the login information
+     * @param authType   the authentication type that will be used to login (valid types are listed in this class as constants)
      * @param zerokToken the token sent by the server, required only if you're using Zero-Knowledge Authentication
-     * @param zerokSeq the sequence sent by the server, required only if you're using Zero-Knowledge Authentication
+     * @param zerokSeq   the sequence sent by the server, required only if you're using Zero-Knowledge Authentication
      */
     public static AuthIQMessage createLoginMessage(JabberContext context, int authType, String zerokToken, int zerokSeq) {
         AuthIQMessage msg = new AuthIQMessage(TYPE_SET);
@@ -222,11 +231,11 @@ public class AuthIQMessage extends JabberIQMessage {
         Element elem = msg.getDOM();
         //the xml structure for a "set" is
         //<query xmlns="jabber:iq:auth"><username/><password|digest|hash/><resource/></query>
-        Element query = elem.getChild("query", JabberCode.XMLNS_IQ_AUTH);
+        Element query = elem.getChild("query", XMLNS_IQ_AUTH);
         //add username
         Element temp;
         if (context.getUsername() != null) {
-            temp = new Element("username", JabberCode.XMLNS_IQ_AUTH);
+            temp = new Element("username", XMLNS_IQ_AUTH);
             temp.setText(context.getUsername());
             query.addContent(temp);
         }
@@ -234,14 +243,14 @@ public class AuthIQMessage extends JabberIQMessage {
             //add authentication type
             switch (authType) {
                 case AUTH_DIGEST:
-                    temp = new Element("digest", JabberCode.XMLNS_IQ_AUTH);
+                    temp = new Element("digest", XMLNS_IQ_AUTH);
                     break;
                 case AUTH_ZERO_KNOWLEDGE:
-                    temp = new Element("hash", JabberCode.XMLNS_IQ_AUTH);
+                    temp = new Element("hash", XMLNS_IQ_AUTH);
                     break;
                 case AUTH_CLEARTEXT:
                 default:
-                    temp = new Element("password", JabberCode.XMLNS_IQ_AUTH);
+                    temp = new Element("password", XMLNS_IQ_AUTH);
                     break;
             }
             String password = msg.getPassword(context, authType);
@@ -250,34 +259,44 @@ public class AuthIQMessage extends JabberIQMessage {
             query.addContent(temp);
         }
         //add the resource
-        temp = new Element("resource", JabberCode.XMLNS_IQ_AUTH);
+        temp = new Element("resource", XMLNS_IQ_AUTH);
         temp.setText(context.getResource());
         query.addContent(temp);
         return msg;
     }
 
-    /** protected method since setting these values should only be done by the message object itself */
+    /**
+     * protected method since setting these values should only be done by the message object itself
+     */
     private void setZerokToken(String zerokToken) {
         this.zerokToken = zerokToken;
     }
 
-    /** protected method since setting these values should only be done by the message object itself */
+    /**
+     * protected method since setting these values should only be done by the message object itself
+     */
     private void setZerokSeq(int zerokSeq) {
         this.zerokSeq = zerokSeq;
     }
 
-    /** @return the 0k token associated with the message. null if none exists */
+    /**
+     * @return the 0k token associated with the message. null if none exists
+     */
     public String getZerokToken() {
         return zerokToken;
     }
 
-    /** @return the 0k sequence associated with the message */
+    /**
+     * @return the 0k sequence associated with the message
+     */
     public int getZerokSeq() {
         return zerokSeq;
     }
 
-    /** @return the MSG_IQ_AUTH message type */
+    /**
+     * @return the MSG_IQ_AUTH message type
+     */
     public int getMessageType() {
-        return JabberCode.MSG_IQ_AUTH;
+        return MSG_IQ_AUTH;
     }
 }

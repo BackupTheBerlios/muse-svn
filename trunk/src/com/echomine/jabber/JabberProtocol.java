@@ -1,5 +1,6 @@
 package com.echomine.jabber;
 
+import alt.java.net.Socket;
 import com.echomine.common.ParseException;
 import com.echomine.net.SocketHandler;
 import com.echomine.util.IOUtil;
@@ -9,7 +10,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXParseException;
 
 import java.io.*;
-import java.net.Socket;
 
 /**
  * The main Jabber protocol handler.  It actually delegates all the incoming data processing to
@@ -74,7 +74,7 @@ public class JabberProtocol implements SocketHandler {
                         System.out.println(ex.getMessage());
                     }
                 }
-                Thread.currentThread().yield();
+                Thread.yield();
             }
             if (shutdown) {
                 //send the last tag
@@ -109,7 +109,9 @@ public class JabberProtocol implements SocketHandler {
         queue.start();
     }
 
-    /** queues up the data and wait for thread to send out the data */
+    /**
+     * queues up the data and wait for thread to send out the data
+     */
     public void send(JabberMessage msg) {
         queue.addMessage(msg);
     }

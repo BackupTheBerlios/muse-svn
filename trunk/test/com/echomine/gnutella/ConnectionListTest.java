@@ -30,9 +30,9 @@ public class ConnectionListTest extends TestCase {
         //run the conn so that the events are properly registered
         conn.fireStartingEventOnly();
         //adding the same connection should result in false
-        assertTrue(!clist.addConnection(conn, cmodel));
+        assertFalse(clist.addConnection(conn, cmodel));
         //adding a connection that contains the same connection model should result in false
-        assertTrue(!clist.addConnection(conn2, cmodel2));
+        assertFalse(clist.addConnection(conn2, cmodel2));
     }
 
     /**
@@ -51,12 +51,12 @@ public class ConnectionListTest extends TestCase {
         //this should return true
         assertTrue(clist.isHostRestricted(InetAddress.getByName("127.0.0.1")));
         //this should return false
-        assertTrue(!clist.isHostRestricted(InetAddress.getByName("10.1.1.1")));
+        assertFalse(clist.isHostRestricted(InetAddress.getByName("10.1.1.1")));
         clist.setRestrictedHostCallback(null);
         //this should return false
-        assertTrue(!clist.isHostRestricted(InetAddress.getByName("127.0.0.1")));
+        assertFalse(clist.isHostRestricted(InetAddress.getByName("127.0.0.1")));
         //and so should this
-        assertTrue(!clist.isHostRestricted(InetAddress.getByName("10.1.1.1")));
+        assertFalse(clist.isHostRestricted(InetAddress.getByName("10.1.1.1")));
     }
 
     /**
@@ -79,13 +79,13 @@ public class ConnectionListTest extends TestCase {
         //now simulate a connection that is added
         conn.fireStartingEventOnly();
         //max connection shouldn't have reached yet
-        assertTrue(!clist.isMaxIncomingReached());
+        assertFalse(clist.isMaxIncomingReached());
         //now let's add another connection
-        conn.fireStartingEventOnly();
+        conn2.fireStartingEventOnly();
         //max connection should be reached here
         assertTrue(clist.isMaxIncomingReached());
         try {
-            conn.fireStartingEventOnly();
+            conn3.fireStartingEventOnly();
             //this should have the connection veto exception fired
             //because max incoming connections is reached
             fail("Connection should have been vetoed due to max incoming connections reached");
@@ -113,13 +113,13 @@ public class ConnectionListTest extends TestCase {
         //now simulate a connection that is added
         conn.fireStartingEventOnly();
         //max connection shouldn't have reached yet
-        assertTrue(!clist.isMaxOutgoingReached());
+        assertFalse(clist.isMaxOutgoingReached());
         //now let's add another connection
-        conn.fireStartingEventOnly();
+        conn2.fireStartingEventOnly();
         //max connection should be reached here
         assertTrue(clist.isMaxOutgoingReached());
         try {
-            conn.fireStartingEventOnly();
+            conn3.fireStartingEventOnly();
             //this should have the connection veto exception fired
             //because max incoming connections is reached
             fail("Connection should have been vetoed due to max incoming connections reached");

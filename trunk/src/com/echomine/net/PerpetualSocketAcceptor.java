@@ -1,9 +1,10 @@
 package com.echomine.net;
 
+import alt.java.net.Socket;
+import alt.java.net.SocketImpl;
 import com.echomine.util.IOUtil;
 
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * <p>Accepts connections indefinitely.  Once a connection is accepted, it is immediately handled in a spawned thread.  The
@@ -39,37 +40,37 @@ public class PerpetualSocketAcceptor extends SocketAcceptor {
     public void accept(final SocketHandler socketHandler) {
         shutdown = false;
         Thread thread = new Thread(
-            new Runnable() {
-                public void run() {
-                    try {
-                        Socket s = null;
-                        while (!shutdown) {
-                            s = socket.accept();
-                            ConnectionModel connectionModel = new ConnectionModel(s.getInetAddress(), s.getPort());
-                            ConnectionEvent e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
-                            ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
-                            try {
-                                socketHandler.start();
-                                fireConnectionStarting(e, vetoEvent);
-                                e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
-                                fireConnectionEstablished(e);
-                                socketHandler.handle(s);
-                                e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_CLOSED);
-                                fireConnectionClosed(e);
-                            } catch (IOException ex) {
-                                //handle threw exception, fire closed event
-                                e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error while handling connection: " + ex.getMessage());
-                                fireConnectionClosed(e);
-                            } catch (ConnectionVetoException ex) {
-                                //do nothing because connection closed is already called
-                            } finally {
-                                IOUtil.closeSocket(s);
+                new Runnable() {
+                    public void run() {
+                        try {
+                            Socket s = null;
+                            while (!shutdown) {
+                                s = new SocketImpl(socket.accept());
+                                ConnectionModel connectionModel = new ConnectionModel(s.getInetAddress(), s.getPort());
+                                ConnectionEvent e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
+                                ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
+                                try {
+                                    socketHandler.start();
+                                    fireConnectionStarting(e, vetoEvent);
+                                    e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
+                                    fireConnectionEstablished(e);
+                                    socketHandler.handle(s);
+                                    e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_CLOSED);
+                                    fireConnectionClosed(e);
+                                } catch (IOException ex) {
+                                    //handle threw exception, fire closed event
+                                    e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error while handling connection: " + ex.getMessage());
+                                    fireConnectionClosed(e);
+                                } catch (ConnectionVetoException ex) {
+                                    //do nothing because connection closed is already called
+                                } finally {
+                                    IOUtil.closeSocket(s);
+                                }
                             }
+                        } catch (IOException ex) {
                         }
-                    } catch (IOException ex) {
                     }
-                }
-            });
+                });
         thread.start();
     }
 
@@ -82,20 +83,20 @@ public class PerpetualSocketAcceptor extends SocketAcceptor {
     public void aaccept(final SocketHandler socketHandler) {
         shutdown = false;
         Thread thread = new Thread(
-            new Runnable() {
-                public void run() {
-                    try {
-                        Socket s;
-                        while (!shutdown) {
-                            s = socket.accept();
-                            ConnectionModel model = new ConnectionModel(s.getInetAddress(), s.getPort());
-                            AcceptorThread athread = new AcceptorThread(socketHandler, s, model);
-                            athread.start();
+                new Runnable() {
+                    public void run() {
+                        try {
+                            Socket s;
+                            while (!shutdown) {
+                                s = new SocketImpl(socket.accept());
+                                ConnectionModel model = new ConnectionModel(s.getInetAddress(), s.getPort());
+                                AcceptorThread athread = new AcceptorThread(socketHandler, s, model);
+                                athread.start();
+                            }
+                        } catch (Exception ex) {
                         }
-                    } catch (Exception ex) {
                     }
-                }
-            });
+                });
         thread.start();
     }
 

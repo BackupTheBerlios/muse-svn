@@ -1,5 +1,7 @@
 package com.echomine.gnutella;
 
+import alt.java.net.Socket;
+import alt.java.net.SocketImpl;
 import com.echomine.gnutella.impl.GivRequestHandler;
 import com.echomine.gnutella.impl.GnutellaDirectDownloadHandler;
 import com.echomine.net.*;
@@ -8,7 +10,6 @@ import com.echomine.util.IPUtil;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.UnknownHostException;
 
 /**
@@ -89,13 +90,13 @@ public class GnutellaDownloadService extends Connection {
             ip = InetAddress.getLocalHost();
         //add the file to the download
         GnutellaFirewalledDownloadInfo info = new
-            GnutellaFirewalledDownloadInfo(
-                new GnutellaConnectionModel(ip, context.getPort()),
-                filemodel, cl, fl, guid);
+                GnutellaFirewalledDownloadInfo(
+                        new GnutellaConnectionModel(ip, context.getPort()),
+                        filemodel, cl, fl, guid);
         givHandler.addRequest(info);
         //send messsage to remote for firewalled download
         MsgPushRequest msg = new MsgPushRequest(guid, ip, context.getPort(),
-            filemodel.getFileIndex());
+                filemodel.getFileIndex());
         cmanager.send(msg);
         return info;
     }
@@ -207,39 +208,39 @@ public class GnutellaDownloadService extends Connection {
 
         public void aconnect(final SocketHandler socketHandler, final ConnectionModel connectionModel) {
             Thread thread = new Thread(
-                new Runnable() {
-                    public void run() {
-                        Socket socket = null;
-                        try {
-                            ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
-                            ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
-                            socketHandler.start();
-                            DirectDownloadConnector.this.fireConnectionStarting(event, vetoEvent);
-                            socket = new Socket(connectionModel.getHost(), connectionModel.getPort());
+                    new Runnable() {
+                        public void run() {
+                            Socket socket = null;
                             try {
-                                event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
-                                DirectDownloadConnector.this.fireConnectionEstablished(event);
-                                socketHandler.handle(socket);
-                                event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_CLOSED);
-                                DirectDownloadConnector.this.fireConnectionClosed(event);
+                                ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
+                                ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
+                                socketHandler.start();
+                                DirectDownloadConnector.this.fireConnectionStarting(event, vetoEvent);
+                                socket = new SocketImpl(new java.net.Socket(connectionModel.getHost(), connectionModel.getPort()));
+                                try {
+                                    event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
+                                    DirectDownloadConnector.this.fireConnectionEstablished(event);
+                                    socketHandler.handle(socket);
+                                    event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_CLOSED);
+                                    DirectDownloadConnector.this.fireConnectionClosed(event);
+                                } catch (IOException ex) {
+                                    event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error while handling connection: " + ex.getMessage());
+                                    DirectDownloadConnector.this.fireConnectionClosed(event);
+                                } finally {
+                                    IOUtil.closeSocket(socket);
+                                }
                             } catch (IOException ex) {
-                                event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error while handling connection: " + ex.getMessage());
+                                try {
+                                    getFileThroughFirewall(guid, filemodel, cl, fl);
+                                } catch (UnknownHostException ex1) {
+                                }
+                                ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error..." + ex.getMessage());
                                 DirectDownloadConnector.this.fireConnectionClosed(event);
-                            } finally {
-                                IOUtil.closeSocket(socket);
+                            } catch (ConnectionVetoException ex) {
+                                //do nothing, connection closed event already fired
                             }
-                        } catch (IOException ex) {
-                            try {
-                                getFileThroughFirewall(guid, filemodel, cl, fl);
-                            } catch (UnknownHostException ex1) {
-                            }
-                            ConnectionEvent event = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error..." + ex.getMessage());
-                            DirectDownloadConnector.this.fireConnectionClosed(event);
-                        } catch (ConnectionVetoException ex) {
-                            //do nothing, connection closed event already fired
                         }
-                    }
-                });
+                    });
             thread.start();
         }
     }

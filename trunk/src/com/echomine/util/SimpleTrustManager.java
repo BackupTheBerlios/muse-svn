@@ -1,7 +1,6 @@
 package com.echomine.util;
 
-import com.sun.net.ssl.X509TrustManager;
-
+import javax.net.ssl.X509TrustManager;
 import java.io.*;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -21,9 +20,13 @@ import java.util.Enumeration;
  * if you want the class to prompt for acceptance.
  */
 public class SimpleTrustManager implements X509TrustManager {
-    /** property for setting promting true/on/false/off */
+    /**
+     * property for setting promting true/on/false/off
+     */
     private static final String KEY_PROMPT = "com.echomine.util.SimpleTrustManager.prompt";
-    /** default value for prompts */
+    /**
+     * default value for prompts
+     */
     private static final String VALUE_PROMPT = "false";
 
     private KeyStore keyStore;
@@ -38,38 +41,39 @@ public class SimpleTrustManager implements X509TrustManager {
      * that can be passed the same three arguments as below.
      */
     public SimpleTrustManager(KeyStore keyStore,
-                              String keyStorePath,
-                              char[] keyStorePassword) {
+            String keyStorePath,
+            char[] keyStorePassword) {
         this.keyStore = keyStore;
         this.keyStorePath = keyStorePath;
         this.keyStorePassword = keyStorePassword;
     }
 
+
     /**
      * isClientTrusted checks to see if the chain is in the keyStore object.
-     * This is done with a call to isChainTrusted.
+     * This is done with a call to checkChainTrusted.
      */
-    public boolean isClientTrusted(X509Certificate[] chain) {
-        return isChainTrusted(chain);
+    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {
+        checkChainTrusted(chain);
     }
 
     /**
      * checks to see if the chain is in the keyStore object.
-     * This is done with a call to isChainTrusted. If not it queries the
+     * This is done with a call to checkChainTrusted. If not it queries the
      * user to see if the chain should be trusted and stored into the
      * keyStore object. The keyStore is then saved in the file whose path
      * is keyStorePath. Examines the system property com.echomine.util.SimpleTrustManager.prompt
      * to determine whether user should be prompted.
      */
-    public boolean isServerTrusted(X509Certificate[] chain) {
+    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {
         String promptVal = System.getProperty(KEY_PROMPT, VALUE_PROMPT);
         boolean prompt = true;
         if (promptVal.compareToIgnoreCase("false") == 0 ||
                 promptVal.compareToIgnoreCase("no") == 0)
             prompt = false;
-        boolean trusted = false;
-        trusted = isChainTrusted(chain); // Is the chain is in the keyStore object?
-        if (!trusted) {                  // the certificate is not trusted - process it
+        try {
+            checkChainTrusted(chain); // Is the chain is in the keyStore object?
+        } catch (CertificateException ex) {
             if (prompt) System.out.println("Untrusted Certificate chain:");
             for (int i = 0; i < chain.length; i++) {
                 // display certificate chain information
@@ -95,7 +99,7 @@ public class SimpleTrustManager implements X509TrustManager {
                 }
             }
             if (s.compareToIgnoreCase("y") == 0) {
-                trusted = true;                              // Trust the chain.
+                // Trust the chain.
                 try {
                     for (int i = 0; i < chain.length; i++) { // Add Chain to the keyStore.
                         keyStore.setCertificateEntry
@@ -133,10 +137,9 @@ public class SimpleTrustManager implements X509TrustManager {
                     }
                 }
             } else {
-                trusted = false;
+                throw new CertificateException("Server Chain is not trusted");
             }
         }
-        return trusted;
     }
 
     // getAcceptedIssuers retrieves all of the certificates in the keyStore
@@ -174,25 +177,20 @@ public class SimpleTrustManager implements X509TrustManager {
     }
 
     /**
-     * isChainTrusted searches the keyStore for any certificate in the
+     * checkChainTrusted searches the keyStore for any certificate in the
      * certificate chain.
+     *
+     * @throws CertificateException if the chain is not trusted
      */
-    private boolean isChainTrusted(X509Certificate[] chain) {
-        boolean trusted = false;
+    private void checkChainTrusted(X509Certificate[] chain) throws CertificateException {
         try {
             // Start with the root and see if it is in the Keystore.
             // The root is at the end of the chain.
-            for (int i = chain.length - 1; i >= 0; i--) {
-                if (keyStore.getCertificateAlias(chain[i]) != null) {
-                    trusted = true;
-                    break;
-                }
-            }
-        } catch (Exception e) {
-            System.out.println("isChainTrusted Exception: "
-                    + e.toString());
-            trusted = false;
+            for (int i = chain.length - 1; i >= 0; i--)
+                if (keyStore.getCertificateAlias(chain[i]) != null) break;
+        } catch (Exception ex) {
+            System.out.println("checkChainTrusted Exception: " + ex.toString());
+            throw new CertificateException("Chain is not trusted: " + ex.getMessage());
         }
-        return trusted;
     }
 }

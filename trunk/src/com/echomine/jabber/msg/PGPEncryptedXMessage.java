@@ -1,7 +1,5 @@
 package com.echomine.jabber.msg;
 
-import org.jdom.Element;
-import com.echomine.jabber.JabberJDOMMessage;
 import com.echomine.jabber.JabberCode;
 
 /**
@@ -12,25 +10,17 @@ import com.echomine.jabber.JabberCode;
  * <p>The key that should be used for encryption is the public key matching the
  * KeyID used for signing the presence received from the recipient.  The actual
  * data that is encrypted is what would be the Body of the chat message.</p>
- * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0027.html">JEP-0027 Version 0.2</a></b></p>
+ * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0027.html">JEP-0027 Version 1.2</a></b></p>
  */
-public class PGPEncryptedXMessage extends JabberJDOMMessage {
-    /** constructs a default message */
-    public PGPEncryptedXMessage() {
-        super(new Element("x", JabberCode.XMLNS_X_PGP_ENCRYPTED));
-    }
-
-    /** sets the PGP encrypted data to the specified data */
-    public void setPGPMessage(String data) {
-        getDOM().setText(data);
-    }
+public class PGPEncryptedXMessage extends AbstractPGPXMessage {
+    private static final String PGP_HEADER = "-----BEGIN PGP MESSAGE-----";
+    private static final String PGP_FOOTER = "-----END PGP MESSAGE-----";
 
     /**
-     * retrieves the encrypted message
-     * @return the encrypted message or null if there is none.
+     * constructs a default message
      */
-    public String getPGPMessage() {
-        return getDOM().getText();
+    public PGPEncryptedXMessage() {
+        super(JabberCode.XMLNS_X_PGP_ENCRYPTED, PGP_HEADER, PGP_FOOTER);
     }
 
     public int getMessageType() {

@@ -1,8 +1,9 @@
 package com.echomine.net;
 
+import alt.java.net.Socket;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
-import java.net.Socket;
 
 /** a handler that writes a string to the remote connection and disconnects immediately. */
 public class StringSocketWriterHandler extends StringSocketHandler {

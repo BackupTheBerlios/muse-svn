@@ -1,10 +1,11 @@
 package com.echomine.net;
 
+import alt.java.net.Socket;
+import alt.java.net.SocketImpl;
 import com.echomine.util.IOUtil;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 
 /**
  * <p>Default Acceptor class for TCP protocols.  It contains event firing methods necessary for status observation.  The code
@@ -49,7 +50,7 @@ public class SocketAcceptor extends TimeableConnection {
     public void accept(SocketHandler socketHandler) {
         Socket s = null;
         try {
-            s = socket.accept();
+            s = new SocketImpl(socket.accept());
             ConnectionEvent e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
             ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
             try {
@@ -82,36 +83,36 @@ public class SocketAcceptor extends TimeableConnection {
      */
     public void aaccept(final SocketHandler socketHandler) {
         Thread thread = new Thread(
-            new Runnable() {
-                public void run() {
-                    Socket s = null;
-                    try {
-                        s = socket.accept();
-                        ConnectionEvent e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
-                        ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
+                new Runnable() {
+                    public void run() {
+                        Socket s = null;
                         try {
-                            socketHandler.start();
-                            fireConnectionStarting(e, vetoEvent);
-                            e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
-                            fireConnectionEstablished(e);
-                            socketHandler.handle(s);
-                            e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_CLOSED);
-                            fireConnectionClosed(e);
+                            s = new SocketImpl(socket.accept());
+                            ConnectionEvent e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_STARTING);
+                            ConnectionEvent vetoEvent = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_VETOED);
+                            try {
+                                socketHandler.start();
+                                fireConnectionStarting(e, vetoEvent);
+                                e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_OPENED);
+                                fireConnectionEstablished(e);
+                                socketHandler.handle(s);
+                                e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_CLOSED);
+                                fireConnectionClosed(e);
+                            } catch (IOException ex) {
+                                //handle threw the exception, fire connection closed
+                                e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error during handling: " + ex.getMessage());
+                                fireConnectionClosed(e);
+                            } catch (ConnectionVetoException ex) {
+                                //do nothing as connection closed event is already fired
+                            } finally {
+                                IOUtil.closeSocket(s);
+                            }
                         } catch (IOException ex) {
-                            //handle threw the exception, fire connection closed
-                            e = new ConnectionEvent(connectionModel, ConnectionEvent.CONNECTION_ERRORED, "Error during handling: " + ex.getMessage());
-                            fireConnectionClosed(e);
-                        } catch (ConnectionVetoException ex) {
-                            //do nothing as connection closed event is already fired
-                        } finally {
-                            IOUtil.closeSocket(s);
+                            //doesn't fire anything since what happens here
+                            //is that someone closed the server socket for us
                         }
-                    } catch (IOException ex) {
-                        //doesn't fire anything since what happens here
-                        //is that someone closed the server socket for us
                     }
-                }
-            });
+                });
         thread.start();
     }
 

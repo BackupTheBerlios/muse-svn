@@ -18,18 +18,26 @@ public class Call {
     private ArrayList params = new ArrayList();
     private SerializerFactory factory;
 
-    /** constructs an empty call object that's normally used for parsing an incoming call object */
+    /**
+     * constructs an empty call object that's normally used for parsing an incoming call object
+     */
     public Call(SerializerFactory factory) {
+        if (factory == null) throw new IllegalArgumentException("Factory cannot be null");
         this.factory = factory;
     }
 
-    /** constructs a request object for sending out */
+    /**
+     * constructs a request object for sending out
+     */
     public Call(String methodName, SerializerFactory factory) {
         this(methodName, null, factory);
     }
 
-    /** constructs a request object with the proper namespace */
+    /**
+     * constructs a request object with the proper namespace
+     */
     public Call(String methodName, Namespace ns, SerializerFactory factory) {
+        if (factory == null) throw new IllegalArgumentException("Factory cannot be null");
         this.methodName = methodName;
         this.ns = ns;
         this.factory = factory;
@@ -71,7 +79,9 @@ public class Call {
         return params.get(idx);
     }
 
-    /** retrieves all the parametes */
+    /**
+     * retrieves all the parametes
+     */
     public Object[] getParameters() {
         return params.toArray();
     }
@@ -103,7 +113,9 @@ public class Call {
         return root;
     }
 
-    /** parses a response from the element. This will effectively clear out the current parameters stored in the object. */
+    /**
+     * parses a response from the element. This will effectively clear out the current parameters stored in the object.
+     */
     public void parse(Element elem) {
         params.clear();
         methodName = null;
@@ -111,7 +123,10 @@ public class Call {
         //first element should be <methodCall>
         //look for the child <methodName>
         methodName = elem.getChildText("methodName", ns);
-        List paramList = elem.getChild("params", ns).getChildren();
+        //parse out parameters if there are any
+        Element paramsElem = elem.getChild("params", ns);
+        if (paramsElem == null) return;
+        List paramList = paramsElem.getChildren();
         int len = paramList.size();
         Element data, value;
         Object paramVal;

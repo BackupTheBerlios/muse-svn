@@ -17,30 +17,37 @@ public class JabberTest {
     private String username;
     private String password;
     private String serverName;
-    private int port = 5222;
+    private int port = JabberContext.DEFAULT_PORT;
     private JabberContext context;
     private Jabber jabber;
+    private boolean ssl;
 
-    public JabberTest(String username, String password, String server) {
+    public JabberTest(String username, String password, String server, boolean ssl) {
         this.username = username;
         this.password = password;
         this.serverName = server;
+        this.ssl = ssl;
     }
 
     protected void setUp() {
         context = new JabberContext(username, password, serverName);
+        context.setSSL(ssl);
+        if (ssl) port = JabberContext.DEFAULT_SSL_PORT;
         jabber = new Jabber();
     }
 
     public static void main(String[] args) {
         if (args.length < 3) {
-            System.out.println("Usage: JabberTest <username> <password> <method to run> [<jabber server>]");
+            System.out.println("Usage: JabberTest <username> <password> <method to run> [<jabber server>] [<ssl{true/false}>]");
             System.exit(1);
         }
         String server = "jabber.org";
-        if (args.length == 4)
+        boolean ssl = false;
+        if (args.length >= 4)
             server = args[3];
-        JabberTest test = new JabberTest(args[0], args[1], server);
+        if (args.length == 5)
+            ssl = Boolean.valueOf(args[4]).booleanValue();
+        JabberTest test = new JabberTest(args[0], args[1], server, ssl);
         test.setUp();
         //reflection and call the method
         try {
@@ -63,7 +70,7 @@ public class JabberTest {
         session.getConnection().addMessageListener(new DefaultMessageListener());
         try {
             session.connect(serverName, port);
-            Thread.currentThread().sleep(60000);
+            Thread.sleep(60000);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -88,7 +95,7 @@ public class JabberTest {
             */
 
             session.getUserService().login();
-            Thread.currentThread().sleep(30000);
+            Thread.sleep(30000);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -115,10 +122,10 @@ public class JabberTest {
             session.getUserService().login();
             //disconnect and reconnect again
             session.disconnect();
-            Thread.currentThread().sleep(1000);
+            Thread.sleep(1000);
             session.connect(serverName, port);
             session.getUserService().login();
-            Thread.currentThread().sleep(1000);
+            Thread.sleep(1000);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -135,7 +142,7 @@ public class JabberTest {
             session.connect(serverName, port);
             session.getUserService().login();
             session.getPresenceService().setToAvailable(null, null, false);
-            Thread.currentThread().sleep(99999999);
+            Thread.sleep(99999999);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -159,7 +166,7 @@ public class JabberTest {
             session.getRosterService().requestRosterList(true);
             session.getRosterService().removeFromRoster(new JID("cktesting@jabber.org"), true);
             session.getRosterService().requestRosterList(true);
-            Thread.currentThread().sleep(99999999);
+            Thread.sleep(99999999);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -236,11 +243,11 @@ public class JabberTest {
             cs.joinChatRoom(new JID("testing@private.jabber.org"), "TestNick", true);
             cs.sendChatMessage(new JID("testing@private.jabber.org"), "Test message to chat room", true);
             cs.setChatAvailable(new JID("testing@private.jabber.org"), PresenceCode.SHOW_DO_NOT_DISTURB, "Out To Lunch", true);
-            Thread.currentThread().sleep(3000);
+            Thread.sleep(3000);
             cs.setChatAvailable(new JID("testing@private.jabber.org"), null, null, true);
-            Thread.currentThread().sleep(3000);
+            Thread.sleep(3000);
             cs.leaveChatRoom(new JID("testing@private.jabber.org"), true);
-            Thread.currentThread().sleep(3000);
+            Thread.sleep(3000);
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
@@ -287,7 +294,9 @@ public class JabberTest {
         }
     }
 
-    /** obtains the server's time and software/version */
+    /**
+     * obtains the server's time and software/version
+     */
     public void testJabberServerInfo() {
         JabberSession session = jabber.createSession(context);
         session.getConnection().addConnectionListener(new DefaultConnectionListener());
@@ -430,8 +439,7 @@ public class JabberTest {
                     LastIQMessage lmsg = (LastIQMessage) msg;
                     //reply back with an idle time of 2000 secs for testing
                     if (!lmsg.isError() && lmsg.getType().equals(JabberIQMessage.TYPE_GET))
-                        event.getSession().getClientService().sendIdleTimeReply(
-                                lmsg.getFrom(), lmsg.getMessageID(), 2000);
+                        event.getSession().getClientService().sendIdleTimeReply(lmsg.getFrom(), lmsg.getMessageID(), 2000);
                 }
             } catch (Exception ex) {
                 ex.printStackTrace();

@@ -50,6 +50,14 @@ public class IOUtil {
         }
     }
 
+    public static void closeSocket(alt.java.net.Socket socket) {
+        try {
+            if (socket != null)
+                socket.close();
+        } catch (IOException ex) {
+        }
+    }
+
     public static void closeSocket(ServerSocket socket) {
         try {
             if (socket != null)

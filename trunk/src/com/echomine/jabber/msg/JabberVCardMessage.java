@@ -9,14 +9,15 @@ import java.util.Iterator;
 
 /**
  * A type of IQ message which contains extended information about a user.
- *
+ * <p/>
  * These information include the user's full name, home and work address,
  * email address, and a lot of other more or less useful data.
- * <p>
+ * <p/>
  * This class can be used both for requesting and for retrieving
  * or sending a vCard message.
- *
+ * <p/>
  * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0054.html">JEP-0054 Version 1.1 (vcard-temp)</a></b></p>
+ *
  * @author Matthias A. Benkard (kirby-2@users.sourceforge.net)
  */
 public class JabberVCardMessage extends JabberIQMessage {
@@ -37,6 +38,7 @@ public class JabberVCardMessage extends JabberIQMessage {
     private String age;       // Age
     private String gender;    // Gender
     private String photo;     // Photo (can be URL or Base64)
+    private String photoType; // the MIME type of the photo for Base64
     private String foreground; // Nick foreground color
     private String background; // Nick foreground color
 
@@ -49,35 +51,29 @@ public class JabberVCardMessage extends JabberIQMessage {
      */
     public class LocalStruct {
         // Phone and stuff.
-        /** Phone number. */
-        public String phone;
-        /** What is this? */
-        public String msg;
-        /** Fax number. */
-        public String fax;
-
+        public String phone; // phone number
+        public String msg; // what is this?
+        public String fax; // fax number
         // Address.
-        /** Street. */
-        public String street;
-        /** Second address line. */
-        public String extadd;
-        /** Town. */
-        public String locality;
-        /** Province/State. */
-        public String region;
-        /** Postal code. */
-        public String pcode;
-        /** Country. */
-        public String country;
+        public String street; // street
+        public String extadd; // second address line
+        public String locality; // town
+        public String region; // province/state
+        public String pcode; // postal code
+        public String country; // country
     }
 
-    /** Normally used for creating a new outgoing message. */
+    /**
+     * Normally used for creating a new outgoing message.
+     */
     public JabberVCardMessage(String type) {
         super(type);
         initToNull();
     }
 
-    /** Creates a JabberVCardMessage of type "set". */
+    /**
+     * Creates a JabberVCardMessage of type "set".
+     */
     public JabberVCardMessage() {
         super(TYPE_SET);
         initToNull();
@@ -85,6 +81,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's full name.
+     *
      * @return The full name of the user, or an empty string if not set.
      */
     public String getFullName() {
@@ -93,8 +90,9 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the full name.
+     *
      * @param pFullName The full name of the user. Set this to an empty string or <code>null</code>
-     *          to have the field be skipped when creating the vCard.
+     *                  to have the field be skipped when creating the vCard.
      */
     public void setFullName(String pFullName) {
         fn = pFullName;
@@ -102,6 +100,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's email address.
+     *
      * @return The email address of the user, or an empty string if not set.
      */
     public String getMail() {
@@ -110,6 +109,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's photo. Can be either URL or photo in Base64
+     *
      * @return The photo of the user, or an empty string if not set.
      */
     public String getPhoto() {
@@ -118,15 +118,37 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's ephoto.
+     *
      * @param pPhoto The photo of the user. Set this to an empty string or <code>null</code>
-     *              to have the field be skipped when creating the vCard.
+     *               to have the field be skipped when creating the vCard.
      */
     public void setPhoto(String pPhoto) {
         photo = pPhoto;
     }
 
     /**
+     * Get the MIME type of the photo if the photo data is Base64. If the photo value is an URL,
+     * returns null.
+     *
+     * @return the Photo type value, or null if photo value is an URL
+     */
+    public String getPhotoType() {
+        return photoType;
+    }
+
+    /**
+     * Set MIME type of a photo, if it's base64-encoded. Set to null if the value of
+     * <code>photo</code> is a URL.
+     *
+     * @param photoType The new Photo type value.
+     */
+    public void setPhotoType(String photoType) {
+        this.photoType = photoType;
+    }
+
+    /**
      * Gets the user's foreground.
+     *
      * @return The foreground of the user, or an empty string if not set.
      */
     public String getForeground() {
@@ -135,8 +157,9 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's foreground.
+     *
      * @param pForeground The foreground of the user. Set this to an empty string or <code>null</code>
-     *              to have the field be skipped when creating the vCard.
+     *                    to have the field be skipped when creating the vCard.
      */
     public void setForeground(String pForeground) {
         foreground = pForeground;
@@ -144,6 +167,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's background.
+     *
      * @return The background of the user, or an empty string if not set.
      */
     public String getBackground() {
@@ -152,8 +176,9 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's background.
+     *
      * @param pBackground The background of the user. Set this to an empty string or <code>null</code>
-     *              to have the field be skipped when creating the vCard.
+     *                    to have the field be skipped when creating the vCard.
      */
     public void setBackground(String pBackground) {
         background = pBackground;
@@ -161,6 +186,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's email address.
+     *
      * @param pMail The email address of the user. Set this to an empty string or <code>null</code>
      *              to have the field be skipped when creating the vCard.
      */
@@ -170,6 +196,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's birthday.
+     *
      * @return The birthday of the user, or an empty string if not set.
      */
     public String getBirthday() {
@@ -178,6 +205,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's birthday.
+     *
      * @param pBirthday The birthday of the user. Set this to an empty string or <code>null</code>
      *                  to have the field be skipped when creating the vCard.
      */
@@ -187,6 +215,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's gender.
+     *
      * @return The gender of the user, or an empty string if not set.
      */
     public String getGender() {
@@ -195,6 +224,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's gender.
+     *
      * @param pGender The gender of the user. Set this to an empty string or <code>null</code>
      *                to have the field be skipped when creating the vCard.
      */
@@ -204,6 +234,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's age.
+     *
      * @return The age of the user, or an empty string if not set.
      */
     public String getAge() {
@@ -212,6 +243,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's age.
+     *
      * @param pAge The age of the user. Set this to an empty string or <code>null</code>
      *             to have the field be skipped when creating the vCard.
      */
@@ -221,6 +253,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's homepage URL.
+     *
      * @return The URL of the user's homepage, or an empty string if not set.
      */
     public String getURL() {
@@ -229,6 +262,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's homepage URL.
+     *
      * @param pURL The URL of the user's homepage. Set this to an empty string or <code>null</code>
      *             to have the field be skipped when creating the vCard.
      */
@@ -238,6 +272,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the organization name.
+     *
      * @return The name of the user's organization, or an empty string if not set.
      */
     public String getOrgName() {
@@ -246,6 +281,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the organization name.
+     *
      * @param pOrgName The name of the user's organization. Set this to an empty string or <code>null</code>
      *                 to have the field be skipped when creating the vCard.
      */
@@ -255,6 +291,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the organization unit.
+     *
      * @return The user's unit in the organization (?), or an empty string if not set.
      */
     public String getOrgUnit() {
@@ -263,6 +300,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the organization unit.
+     *
      * @param pOrgUnit The user's unit in the organization (?). Set this to an empty string or
      *                 <code>null</code> to have the field be skipped when creating the vCard.
      */
@@ -272,6 +310,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's title.
+     *
      * @return The title of the user, or an empty string if not set.
      */
     public String getTitle() {
@@ -280,6 +319,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's title.
+     *
      * @param pTitle The title of the user. Set this to an empty string or <code>null</code>
      *               to have the field be skipped when creating the vCard.
      */
@@ -289,6 +329,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's role.
+     *
      * @return The role of the user, or an empty string if not set.
      */
     public String getRole() {
@@ -297,6 +338,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's role.
+     *
      * @param pRole The role of the user. Set this to an empty string or <code>null</code>
      *              to have the field be skipped when creating the vCard.
      */
@@ -306,6 +348,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's advanced description.
+     *
      * @return The description of the user, or an empty string if not set.
      */
     public String getDesc() {
@@ -314,6 +357,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's advanced description.
+     *
      * @param pDesc The description of the user. Set this to an empty string or <code>null</code>
      *              to have the field be skipped when creating the vCard.
      */
@@ -323,6 +367,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's Jabber ID.
+     *
      * @return The Jabber ID of the user, or null if not set.
      */
     public JID getJID() {
@@ -331,6 +376,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's Jabber ID.
+     *
      * @param pJID The Jabber ID of the user. Set this to <code>null</code>
      *             to have the field be skipped when creating the vCard.
      */
@@ -340,6 +386,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's middle name.
+     *
      * @return The middle name of the user, or an empty string if not set.
      */
     public String getMiddle() {
@@ -348,6 +395,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's middle name.
+     *
      * @param pMiddleName The middle name of the user. Set this to an empty string or <code>null</code>
      *                    to have the field be skipped when creating the vCard.
      */
@@ -357,6 +405,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's first name.
+     *
      * @return The first name of the user, or an empty string if not set.
      */
     public String getGiven() {
@@ -365,6 +414,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's first name.
+     *
      * @param pGivenName The first name of the user. Set this to an empty string or <code>null</code>
      *                   to have the field be skipped when creating the vCard.
      */
@@ -374,6 +424,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's family name.
+     *
      * @return The family name of the user, or an empty string if not set.
      */
     public String getFamily() {
@@ -382,6 +433,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's family name.
+     *
      * @param pFamilyName The family name of the user. Set this to an empty string or <code>null</code>
      *                    to have the field be skipped when creating the vCard.
      */
@@ -391,6 +443,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the user's nickname.
+     *
      * @return The nickname of the user, or an empty string if not set.
      */
     public String getNickname() {
@@ -399,6 +452,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Sets the user's nickname.
+     *
      * @param pNickname The nickname of the user. Set this to an empty string or <code>null</code>
      *                  to have the field be skipped when creating the vCard.
      */
@@ -408,6 +462,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the home struct.
+     *
      * @return A reference to the message's {@link com.echomine.jabber.msg.JabberVCardMessage.LocalStruct} that contains
      *         information about the user's home.
      */
@@ -417,6 +472,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the work struct.
+     *
      * @return A reference to the message's {@link com.echomine.jabber.msg.JabberVCardMessage.LocalStruct} that contains
      *         information about the user's working place.
      */
@@ -426,8 +482,9 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Gets the message type.
+     *
      * @return This message's type.
-     * @see    com.echomine.jabber.JabberCode
+     * @see com.echomine.jabber.JabberCode
      */
     public int getMessageType() {
         return JabberCode.MSG_IQ_VCARD;
@@ -439,6 +496,7 @@ public class JabberVCardMessage extends JabberIQMessage {
         given = "";
         middle = "";
         photo = "";
+        photoType = "";
         fn = "";
         email = "";
         bday = "";
@@ -458,10 +516,12 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Parses element/incoming message into a message object.
-     * @param  parser
-     * @param  msgTree The element which the message object will be constructed from.
+     *
+     * @param parser  the messageg parser
+     * @param msgTree The element which the message object will be constructed from.
      * @return The message object created by parsing the <code>Element msgTree</code>.
-     * @throws com.echomine.common.ParseException if parsing the message failed.
+     * @throws com.echomine.common.ParseException
+     *          if parsing the message failed.
      */
     public JabberMessage parse(JabberMessageParser parser, Element msgTree) throws ParseException {
         if (msgTree == null || parser == null)
@@ -499,8 +559,20 @@ public class JabberVCardMessage extends JabberIQMessage {
         title = vCard.getChildText("TITLE", ns);
         role = vCard.getChildText("ROLE", ns);
         desc = vCard.getChildText("DESC", ns);
-        jid = new JID(vCard.getChildText("JABBERID", ns));
-        photo = vCard.getChildText("PHOTO", ns);
+        el = vCard.getChild("JABBERID", ns);
+        if (el != null)
+            jid = new JID(el.getText());
+        el = vCard.getChild("PHOTO", ns);
+        //obtain the photo type for the photo
+        if (el != null) {
+            photoType = el.getChildText("TYPE", ns);
+
+            if (photoType == null || "".equals(photoType)) {
+                photo = el.getChildText("EXTVAL", ns);
+            } else {
+                photo = el.getChildText("BINVAL", ns);
+            }
+        }
         foreground = vCard.getChildText("FOREGROUND", ns);
         background = vCard.getChildText("BACKGROUND", ns);
 
@@ -558,8 +630,10 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * Encodes the message into XML.
+     *
      * @return The XML string.
-     * @throws com.echomine.common.ParseException if something wicked happened while encoding the message.
+     * @throws com.echomine.common.ParseException
+     *          if something wicked happened while encoding the message.
      */
     public String encode() throws ParseException {
         // Convert all the stuff into a DOM tree...
@@ -578,7 +652,16 @@ public class JabberVCardMessage extends JabberIQMessage {
         if (jid != null)
             add(e, "JABBERID", jid.toString());
         add(e, "DESC", desc);
-        add(e, "PHOTO", photo);
+        if (photo != null && !"".equals(photo)) {
+            Element u = new Element("PHOTO", ns);
+            if (photoType == null || "".equals(photoType)) {
+                add(u, "EXTVAL", photo);
+            } else {
+                add(u, "TYPE", photoType);
+                add(u, "BINVAL", photo);
+            }
+            e.addContent(u);
+        }
         add(e, "FOREGROUND", foreground);
         add(e, "BACKGROUND", background);
 
@@ -664,7 +747,7 @@ public class JabberVCardMessage extends JabberIQMessage {
 
     /**
      * A convenience method to add a pair of strings to a DOM element.
-     *
+     * <p/>
      * This method adds to the <code>Element e</code> a new element with the name given
      * by the <code>elname</code> parameter and sets the new element's content to
      * the <code>eltext</code> string. If <code>eltext</code> is empty, nothing happens
@@ -675,7 +758,7 @@ public class JabberVCardMessage extends JabberIQMessage {
      * @param eltext The content of the new element.
      */
     protected void add(Element e, String elname, String eltext) {
-        if (e != null && eltext != null && !eltext.equals(""))
+        if (e != null && !"".equals(eltext))
             e.addContent(new Element(elname, JabberCode.XMLNS_IQ_VCARD).setText(eltext));
     }
 }

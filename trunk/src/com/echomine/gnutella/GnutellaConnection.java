@@ -77,5 +77,5 @@ public interface GnutellaConnection {
      * retrieves a list of vendor-specific feature headers that the current connection supports.  These will also include
      * other headers such as the user agent and other information.
      */
-    HTTPHeader getVendorFeartureHeaders();
+    HTTPHeader getVendorFeatureHeaders();
 }

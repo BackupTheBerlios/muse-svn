@@ -13,19 +13,27 @@ import java.util.Iterator;
  * subscription related information.
  */
 public class RosterItem {
+    public static final String SUBSCRIBE_BOTH = "both";
+    public static final String SUBSCRIBE_FROM = "from";
+    public static final String SUBSCRIBE_NONE = "none";
+    public static final String SUBSCRIBE_REMOVE = "remove";
+    public static final String SUBSCRIBE_TO = "to";
     private String name;
     private JID jid;
     private ArrayList groups = new ArrayList();
     private String subscription;
     private String ask;
 
-    /** default constructor usually for creating elements from existing data (ie. incoming info) */
+    /**
+     * default constructor usually for creating elements from existing data (ie. incoming info)
+     */
     protected RosterItem() {
     }
 
     /**
      * default constructor for creating a roster item for use.
-     * @param jid the JID of the roster item
+     *
+     * @param jid  the JID of the roster item
      * @param name optional nickname for the roster JID (null if none)
      */
     public RosterItem(JID jid, String name) {
@@ -41,22 +49,30 @@ public class RosterItem {
         this.name = name;
     }
 
-    /** @return the JID stored in the roster item */
+    /**
+     * @return the JID stored in the roster item
+     */
     public JID getJID() {
         return jid;
     }
 
-    /** sets the JID to be stored in this roster item */
+    /**
+     * sets the JID to be stored in this roster item
+     */
     public void setJID(JID jid) {
         this.jid = jid;
     }
 
-    /** @return the subscription status of the roster item */
+    /**
+     * @return the subscription status of the roster item
+     */
     public String getSubscription() {
         return subscription;
     }
 
-    /** sets the subscription status of the roster item */
+    /**
+     * sets the subscription status of the roster item
+     */
     public void setSubscription(String subscription) {
         this.subscription = subscription;
     }
@@ -69,18 +85,23 @@ public class RosterItem {
         this.ask = ask;
     }
 
-    /** adds a group to the roster item */
+    /**
+     * adds a group to the roster item
+     */
     public void addGroup(String name) {
         groups.add(name);
     }
 
-    /** removes a groups from the roster item */
+    /**
+     * removes a groups from the roster item
+     */
     public void removeGroup(String name) {
         groups.remove(name);
     }
 
     /**
      * retrieves the list of groups that the roster item is in. The array will never be null but may contain zero elements.
+     *
      * @return an array of group names the roster item is in
      */
     public String[] getGroups() {
@@ -89,13 +110,16 @@ public class RosterItem {
         return groupList;
     }
 
-    /** is the item/user in the specified group? */
+    /**
+     * is the item/user in the specified group?
+     */
     public boolean isInGroup(String name) {
         return groups.contains(name);
     }
 
     /**
      * indicates that this item should be removed or not
+     *
      * @param remove true if item should be deleted from server, false otherwise
      */
     public void setRemove(boolean remove) {
@@ -132,6 +156,7 @@ public class RosterItem {
      * used to create a roster item into an object by parsing the elements passed in as the parameter.
      * Normally this is used to create roster items from incoming messages.  If you're using this,
      * make sure that the element is <item xmlns="jabber:iq:roster"/>.  It does not start at <iq> tag.
+     *
      * @throws ParseException if the JID of the roster item cannot be parsed properly
      */
     public static RosterItem createRosterItem(Element rosterElem) throws ParseException {
@@ -150,7 +175,9 @@ public class RosterItem {
         return item;
     }
 
-    /** returns a debugging output stream */
+    /**
+     * returns a debugging output stream
+     */
     public String toString() {
         StringBuffer buf = new StringBuffer(200);
         buf.append("<item jid=\"").append(jid.toString()).append("\" ");

@@ -1,12 +1,15 @@
 package com.echomine.net;
 
+import alt.java.net.Socket;
+import alt.java.net.SocketImpl;
 import com.echomine.util.IOUtil;
 import junit.framework.TestCase;
 
 import java.io.IOException;
-import java.net.Socket;
 
-/** this tests all the possible socket acceptor codes */
+/**
+ * this tests all the possible socket acceptor codes
+ */
 public class SocketAcceptorTest extends TestCase {
     ConnectionModel model;
     SocketAcceptor acceptor;
@@ -46,7 +49,7 @@ public class SocketAcceptorTest extends TestCase {
         acceptor.close();
         //sleep for a short period so that there is time for the thread and socket
         //to close down
-        Thread.currentThread().sleep(100);
+        Thread.sleep(100);
     }
 
     /**
@@ -55,7 +58,7 @@ public class SocketAcceptorTest extends TestCase {
     public void testSocketAcceptorNormalAsync() throws Exception {
         acceptor.aaccept(handler);
         //now let's simulate a connect
-        Socket socket = new Socket("127.0.0.1", 7000);
+        Socket socket = new SocketImpl(new java.net.Socket("127.0.0.1", 7000));
         byte[] data = new byte[10];
         int bytesRead = socket.getInputStream().read(data);
         if (bytesRead == -1)
@@ -77,7 +80,7 @@ public class SocketAcceptorTest extends TestCase {
         };
         thread.start();
         //now let's simulate a connect
-        Socket socket = new Socket("127.0.0.1", 7000);
+        Socket socket = new SocketImpl(new java.net.Socket("127.0.0.1", 7000));
         byte[] data = new byte[10];
         int bytesRead = socket.getInputStream().read(data);
         if (bytesRead == -1)
@@ -94,9 +97,9 @@ public class SocketAcceptorTest extends TestCase {
         AcceptorConnectionListener l = new AcceptorConnectionListener();
         acceptor.aaccept(handler);
         acceptor.addConnectionListener(l);
-        Socket socket = new Socket("127.0.0.1", 7000);
+        Socket socket = new SocketImpl(new java.net.Socket("127.0.0.1", 7000));
         //no need to read data as we're only checking connection event
-        Thread.currentThread().sleep(500);
+        Thread.sleep(500);
         IOUtil.closeSocket(socket);
         assertTrue(l.starting == true);
         assertTrue(l.established == true);
@@ -110,9 +113,9 @@ public class SocketAcceptorTest extends TestCase {
         VetoedConnectionListener l = new VetoedConnectionListener();
         acceptor.aaccept(handler);
         acceptor.addConnectionListener(l);
-        Socket socket = new Socket("127.0.0.1", 7000);
+        Socket socket = new SocketImpl(new java.net.Socket("127.0.0.1", 7000));
         //no need to read data as we're only checking connection event
-        Thread.currentThread().sleep(500);
+        Thread.sleep(500);
         IOUtil.closeSocket(socket);
         assertTrue(l.starting == true);
         assertTrue(l.established == false);

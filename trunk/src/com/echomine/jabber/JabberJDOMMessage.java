@@ -1,12 +1,9 @@
 package com.echomine.jabber;
 
 import com.echomine.common.ParseException;
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.Iterator;
 
 /**
@@ -28,12 +25,16 @@ public class JabberJDOMMessage extends JabberMessage implements JabberMessagePar
         super();
     }
 
-    /** normally used internally or creating outgoing messages. */
+    /**
+     * normally used internally or creating outgoing messages.
+     */
     public JabberJDOMMessage(Element rootElem) {
         this.msgTree = rootElem;
         String id = rootElem.getAttributeValue("id");
         if (id != null)
-            setMessageID(id);
+            messageID = id;
+        else
+            msgTree.setAttribute("id", messageID);
     }
 
     public JabberMessage parse(JabberMessageParser parser, Element msgTree) throws ParseException {
@@ -41,8 +42,19 @@ public class JabberJDOMMessage extends JabberMessage implements JabberMessagePar
         //check if there is an ID, if there is, use it
         String id = msgTree.getAttributeValue("id");
         if (id != null)
-            setMessageID(id);
+            messageID = id;
         return this;
+    }
+
+    /**
+     * sets the message id.  This is not used by outsiders to set the message id since
+     * ID's are automatically generated. Basically, all outgoing message have automatic IDs generated, but incoming message IDs are
+     * sent by the remote server. However, sometimes you may need to manipulate
+     * the id yourself, though it's normally not the case.
+     */
+    public void setMessageID(String messageID) {
+        this.messageID = messageID;
+        msgTree.setAttribute("id", messageID);
     }
 
     /**
@@ -68,44 +80,26 @@ public class JabberJDOMMessage extends JabberMessage implements JabberMessagePar
      * If this is not a desired behavior, you will need to override and encode your own message.
      */
     public String encode() throws ParseException {
-        StringWriter writer = new StringWriter(100);
-        //first write out the tag
-        writer.write("<" + msgTree.getQualifiedName());
-        //write out the namespace
-        if (!msgTree.getNamespaceURI().equals(""))
-            writer.write(" xmlns=\"" + msgTree.getNamespaceURI() + "\"");
-        //write out the attributes
-        Iterator iter = msgTree.getAttributes().iterator();
-        Attribute attr;
-        while (iter.hasNext()) {
-            attr = (Attribute) iter.next();
-            writer.write(" " + attr.getQualifiedName() + "='" + attr.getValue() + "'");
-        }
-        //close the tag
-        writer.write(">");
-        //write out the child elements
-        iter = msgTree.getChildren().iterator();
-        Element elem;
-        XMLOutputter os = getXMLOutputter();
-        while (iter.hasNext()) {
-            elem = (Element) iter.next();
-            try {
-                os.output(elem, writer);
-            } catch (IOException ex) {
-            }
-        }
-        //output the x messages
-        if (isSendXMessages() && getXMessages() != null) {
-            iter = getXMessages().values().iterator();
+        if (isSendXMessages() && getXMessages() != null && !getXMessages().isEmpty()) {
+            //attach x messages to the end of the DOM
+            Iterator iter = getXMessages().values().iterator();
             JabberMessage msg;
-            while (iter.hasNext()) {
-                msg = (JabberMessage) iter.next();
-                writer.write(msg.encode());
+            msg = (JabberMessage) iter.next();
+            if (JabberJDOMMessage.class.isAssignableFrom(msg.getClass())) {
+                msgTree.addContent(((JabberJDOMMessage) msg).getDOM());
+            } else {
+                //not assignable from JabberJDOMMessage, let's turn it into DOM first
+                try {
+                    Element dom = JabberUtil.parseXmlStringToDOM(msg.encode());
+                    msgTree.addContent(dom);
+                } catch (Exception ex) {
+                    //IOException and JDOMException
+                    throw new ParseException("Unable to parse a JabberMessage text into DOM element", ex);
+                }
             }
         }
-        //output the end tag
-        writer.write("</" + msgTree.getQualifiedName() + ">");
-        return writer.toString();
+        XMLOutputter os = getXMLOutputter();
+        return os.outputString(msgTree);
     }
 
     public String toString() {
@@ -116,7 +110,9 @@ public class JabberJDOMMessage extends JabberMessage implements JabberMessagePar
         }
     }
 
-    /** retrieves the XML Outputter associated with every jabber jdom message. it does lazy loading for memory conservation. */
+    /**
+     * retrieves the XML Outputter associated with every jabber jdom message. it does lazy loading for memory conservation.
+     */
     protected XMLOutputter getXMLOutputter() {
         if (output == null) {
             output = new XMLOutputter();

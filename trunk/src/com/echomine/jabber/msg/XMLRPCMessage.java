@@ -13,7 +13,7 @@ import org.jdom.Element;
  * allow you to create a method call for the request.  Any incoming messages from the server is considered a response message.</p>
  * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0009.html">JEP-0009 Version 2.0</a></b></p>
  */
-public class XMLRPCMessage extends JabberIQMessage {
+public class XMLRPCMessage extends JabberIQMessage implements JabberCode {
     public static final int XMLRPC_CALL = 1;
     public static final int XMLRPC_RESPONSE = 2;
     private int rpcType;
@@ -28,11 +28,13 @@ public class XMLRPCMessage extends JabberIQMessage {
      * The message is also sent asynchronously.  If you want to wait for
      * a response, then you must explicitly set the Synchronization property.
      * If you set the response or call manually, the iq type and XMLRPC type will automatically be set to the proper values.
+     * The default SerializerFactory is used for the factory.
+     *
+     * @see SerializerFactory
      */
     public XMLRPCMessage() {
         super(TYPE_SET);
-        getDOM().addContent(new Element("query", JabberCode.XMLNS_IQ_XMLRPC));
-        factory = new SerializerFactory();
+        getDOM().addContent(new Element("query", XMLNS_IQ_XMLRPC));
     }
 
     public XMLRPCMessage(Response response) {
@@ -46,6 +48,13 @@ public class XMLRPCMessage extends JabberIQMessage {
     }
 
     /**
+     * Sets a custom serializer factory instead of using the default one.
+     */
+    public void setFactory(SerializerFactory factory) {
+        this.factory = factory;
+    }
+
+    /**
      * parses the message. The parser will only retrieve information to find out
      * what type of XMLRPC message this is (call/response).
      */
@@ -53,7 +62,7 @@ public class XMLRPCMessage extends JabberIQMessage {
         //let the parent parse first
         super.parse(parser, msgTree);
         //get the child element to see if it's methodCall or methodName
-        Element query = msgTree.getChild("query", JabberCode.XMLNS_IQ_XMLRPC);
+        Element query = msgTree.getChild("query", XMLNS_IQ_XMLRPC);
         //if query is null, then it means the message hasn't been fully initialized
         if (query != null) {
             String method = ((Element) query.getChildren().get(0)).getName();
@@ -74,11 +83,11 @@ public class XMLRPCMessage extends JabberIQMessage {
     public String encode() throws ParseException {
         switch (rpcType) {
             case XMLRPC_CALL:
-                if (call == null)
+                if (getCall() == null)
                     throw new ParseException("XMLRPC Message: No call set for XMLRPC Call Type!");
                 break;
             case XMLRPC_RESPONSE:
-                if (response == null)
+                if (getResponse() == null)
                     throw new ParseException("XMLRPC Message: No response set for XMLRPC Response Type!");
                 break;
             default:
@@ -110,44 +119,55 @@ public class XMLRPCMessage extends JabberIQMessage {
         }
     }
 
-    /** convenience methods to check if the messag is a response */
+    /**
+     * convenience methods to check if the messag is a response
+     */
     public boolean isResponse() {
         return (rpcType == XMLRPC_RESPONSE) ? true : false;
     }
 
-    /** convenience methods to check if the messag is a call/request */
+    /**
+     * convenience methods to check if the messag is a call/request
+     */
     public boolean isCall() {
         return (rpcType == XMLRPC_CALL) ? true : false;
     }
 
     /**
      * retrieves the response object if there is one for this message.
+     * it utilizes the currently set serializer factory to parse the response.
+     *
      * @return the response object, null if none exists
      */
     public Response getResponse() {
         //use cached response if possible
         if (response != null) return response;
         //parse out the data
-        Element elem = getDOM().getChild("query", JabberCode.XMLNS_IQ_XMLRPC).getChild("methodResponse",
-                JabberCode.XMLNS_IQ_XMLRPC);
+        Element elem = getDOM().getChild("query", XMLNS_IQ_XMLRPC).getChild("methodResponse",
+                XMLNS_IQ_XMLRPC);
         if (elem == null) return null;
         rpcType = XMLRPC_RESPONSE;
-        response = new Response(elem);
+        if (factory == null) factory = new SerializerFactory();
+        response = new Response(factory);
+        response.parse(elem);
         return response;
     }
 
     /**
      * retrieves the call object if there is one for this message.
+     * it utilizes the currently set serializer factory to parse the call.
+     *
      * @return the call object, null if none exists
      */
     public Call getCall() {
         //use cached response if possible
         if (call != null) return call;
         //parse out the data
-        Element elem = getDOM().getChild("query", JabberCode.XMLNS_IQ_XMLRPC).getChild("methodCall",
-                JabberCode.XMLNS_IQ_XMLRPC);
+        Element elem = getDOM().getChild("query", XMLNS_IQ_XMLRPC).getChild("methodCall",
+                XMLNS_IQ_XMLRPC);
         if (elem == null) return null;
         rpcType = XMLRPC_CALL;
+        if (factory == null) factory = new SerializerFactory();
         call = new Call(factory);
         call.parse(elem);
         return call;
@@ -165,11 +185,11 @@ public class XMLRPCMessage extends JabberIQMessage {
         call = null;
         this.response = response;
         Element elemTree = getDOM();
-        Element query = elemTree.getChild("query", JabberCode.XMLNS_IQ_XMLRPC);
+        Element query = elemTree.getChild("query", XMLNS_IQ_XMLRPC);
         //remove all children
         query.getChildren().clear();
         //set the call's namespace to our own to compensate for Jabber's protocol
-        response.setNamespace(JabberCode.XMLNS_IQ_XMLRPC);
+        response.setNamespace(XMLNS_IQ_XMLRPC);
         //add the call stuff into the tree
         query.addContent(response.getDOM());
     }
@@ -186,16 +206,18 @@ public class XMLRPCMessage extends JabberIQMessage {
         response = null;
         this.call = call;
         Element elemTree = getDOM();
-        Element query = elemTree.getChild("query", JabberCode.XMLNS_IQ_XMLRPC);
+        Element query = elemTree.getChild("query", XMLNS_IQ_XMLRPC);
         //remove all children
         query.getChildren().clear();
         //set the call's namespace to our own to compensate for Jabber's protocol
-        call.setNamespace(JabberCode.XMLNS_IQ_XMLRPC);
+        call.setNamespace(XMLNS_IQ_XMLRPC);
         //add the call stuff into the tree
         query.addContent(call.getDOM());
     }
 
-    /** get the type for this XMLRPC message, whether it is a request or response type. */
+    /**
+     * get the type for this XMLRPC message, whether it is a request or response type.
+     */
     public int getXMLRPCType() {
         return rpcType;
     }
@@ -226,8 +248,10 @@ public class XMLRPCMessage extends JabberIQMessage {
         return msg;
     }
 
-    /** @return the message type code of this message */
+    /**
+     * @return the message type code of this message
+     */
     public int getMessageType() {
-        return JabberCode.MSG_IQ_XMLRPC;
+        return MSG_IQ_XMLRPC;
     }
 }

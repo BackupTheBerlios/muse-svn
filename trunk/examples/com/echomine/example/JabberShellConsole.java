@@ -23,20 +23,24 @@ public class JabberShellConsole {
     private String username;
     private String password;
     private String serverName;
-    private int port = 5222;
+    private int port = JabberContext.DEFAULT_PORT;
+    private boolean ssl = false;
     private JabberContext context;
     private Jabber jabber;
     private JabberSession session;
     private Interpreter interpreter;
 
-    public JabberShellConsole(String username, String password, String server) {
+    public JabberShellConsole(String username, String password, String server, boolean ssl) {
         this.username = username;
         this.password = password;
         this.serverName = server;
+        this.ssl = ssl;
     }
 
     protected void setUp() throws Exception {
         context = new JabberContext(username, password, serverName);
+        context.setSSL(ssl);
+        if (ssl == true) port = JabberContext.DEFAULT_SSL_PORT;
         jabber = new Jabber();
         session = jabber.createSession(context);
         interpreter = new Interpreter(new ShellConsoleInterface());
@@ -45,13 +49,16 @@ public class JabberShellConsole {
 
     public static void main(String[] args) throws Exception {
         if (args.length < 2) {
-            System.out.println("Usage: JabberShellConsole <username> <password> [<jabber server>]");
+            System.out.println("Usage: JabberShellConsole <username> <password> [<jabber server>] [<ssl{true/false}>]");
             System.exit(1);
         }
         String server = "jabber.org";
+        boolean ssl = false;
+        if (args.length >= 3)
+            server = args[2];
         if (args.length == 4)
-            server = args[3];
-        JabberShellConsole console = new JabberShellConsole(args[0], args[1], server);
+            ssl = Boolean.valueOf(args[3]).booleanValue();
+        JabberShellConsole console = new JabberShellConsole(args[0], args[1], server, ssl);
         console.setUp();
         console.runConsole();
     }

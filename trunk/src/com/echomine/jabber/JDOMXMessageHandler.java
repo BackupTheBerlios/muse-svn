@@ -1,10 +1,11 @@
 package com.echomine.jabber;
 
-import java.util.HashMap;
 import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.xml.sax.Attributes;
+
+import java.util.HashMap;
 
 /**
  * <p>This handler adds support for handling any jabber extensions. If your message does not support X Namespaces,
@@ -31,7 +32,9 @@ public class JDOMXMessageHandler extends JDOMMessageHandler {
         super(msgParser);
     }
 
-    /** @return a list of JabberMessage instances of the X Namespace */
+    /**
+     * @return a list of JabberMessage instances of the X Namespace
+     */
     public HashMap getXMessages() {
         return xMsgs;
     }
@@ -43,11 +46,13 @@ public class JDOMXMessageHandler extends JDOMMessageHandler {
         xMsgs = new HashMap();
     }
 
-    /** This method will save the X Messages into the message object */
+    /**
+     * This method will save the X Messages into the message object
+     */
     public void endMessage() {
         super.endMessage();
-        //get the message and add the x messages into it
-        getMessage().setXMessages(xMsgs);
+        //get the message and add the x messages into it if there are xmessages
+        if (!xMsgs.isEmpty()) getMessage().setXMessages(xMsgs);
     }
 
     public void startElement(String namespaceURI, String localName, String qName, Attributes attr) {

@@ -1,7 +1,8 @@
 package com.echomine.net;
 
+import alt.java.net.Socket;
+
 import java.io.IOException;
-import java.net.Socket;
 
 /** Handler handles all connection details, including handshaking and data processing. */
 public interface SocketHandler {

@@ -2,10 +2,8 @@ package com.echomine.xmlrpc;
 
 import junit.framework.TestCase;
 import org.jdom.Document;
-import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 
-import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Date;
@@ -26,7 +24,21 @@ public class CallTest extends TestCase {
         super.tearDown();
     }
 
-    public void testCallWithSerializers() {
+    /**
+     * Tests that calls with no parameters are parsed and encoded properly
+     */
+    public void testCallWithNoParameters() throws Exception {
+        Call call = new Call("getHelloWorldString", factory);
+        String callStr = call.toString();
+        SAXBuilder builder = new SAXBuilder();
+        Document doc = builder.build(new StringReader(callStr));
+        Call inCall = new Call(factory);
+        inCall.parse(doc.getRootElement());
+        assertEquals("getHelloWorldString", inCall.getMethodName());
+        assertEquals(0, inCall.getParameters().length);
+    }
+
+    public void testCallWithSerializers() throws Exception {
         Call call = new Call("getHelloWorldString", factory);
         call.addParameter("Testing 1 2 3");
         ArrayList list = new ArrayList();
@@ -45,27 +57,21 @@ public class CallTest extends TestCase {
         call.addParameter("a base64 string".getBytes());
         String callStr = call.toString();
         //parse the call back to original
-        try {
-            SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(new StringReader(callStr));
-            Call inCall = new Call(factory);
-            inCall.parse(doc.getRootElement());
-            assertEquals("getHelloWorldString", inCall.getMethodName());
-            Object[] objs = inCall.getParameters();
-            assertEquals("Testing 1 2 3", objs[0]);
-            assertEquals("index 0", ((ArrayList) objs[1]).get(0));
-            assertEquals("index 1", ((ArrayList) objs[1]).get(1));
-            assertEquals("index 2", ((ArrayList) objs[1]).get(2));
-            assertEquals(1, ((Integer) ((HashMap) objs[2]).get("faultCode")).intValue());
-            assertEquals("too few < parameters.", ((HashMap) objs[2]).get("faultString"));
-            assertTrue(((Boolean) objs[3]).booleanValue());
-            assertEquals(2342984288D, ((Double) objs[4]).doubleValue(), 0);
-            assertEquals(date.toString(), objs[5].toString());
-            assertEquals("a base64 string", new String((byte[]) objs[6]));
-        } catch (JDOMException ex) {
-            ex.printStackTrace();
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
+        SAXBuilder builder = new SAXBuilder();
+        Document doc = builder.build(new StringReader(callStr));
+        Call inCall = new Call(factory);
+        inCall.parse(doc.getRootElement());
+        assertEquals("getHelloWorldString", inCall.getMethodName());
+        Object[] objs = inCall.getParameters();
+        assertEquals("Testing 1 2 3", objs[0]);
+        assertEquals("index 0", ((ArrayList) objs[1]).get(0));
+        assertEquals("index 1", ((ArrayList) objs[1]).get(1));
+        assertEquals("index 2", ((ArrayList) objs[1]).get(2));
+        assertEquals(1, ((Integer) ((HashMap) objs[2]).get("faultCode")).intValue());
+        assertEquals("too few < parameters.", ((HashMap) objs[2]).get("faultString"));
+        assertTrue(((Boolean) objs[3]).booleanValue());
+        assertEquals(2342984288D, ((Double) objs[4]).doubleValue(), 0);
+        assertEquals(date.toString(), objs[5].toString());
+        assertEquals("a base64 string", new String((byte[]) objs[6]));
     }
 }

@@ -22,15 +22,15 @@ abstract public class AbstractJabberMessage extends JabberJDOMMessage {
     public AbstractJabberMessage(String type, Element root) {
         super(root);
         setType(type);
-        //get the first element, which should be the main tagtag
-        getDOM().setAttribute("id", getMessageID());
     }
 
     protected AbstractJabberMessage() {
         super();
     }
 
-    /** parses the message. The parser is really not used */
+    /**
+     * parses the message. The parser is really not used
+     */
     public JabberMessage parse(JabberMessageParser parser, Element msgTree) throws ParseException {
         super.parse(parser, msgTree);
         this.type = msgTree.getAttributeValue("type");
@@ -40,19 +40,19 @@ abstract public class AbstractJabberMessage extends JabberJDOMMessage {
         val = msgTree.getAttributeValue("from");
         if (val != null)
             this.from = new JID(val);
-        //retrieve the message ID sent by the server
-        String msgid = msgTree.getAttributeValue("id");
-        if (msgid != null)
-            setMessageID(msgid);
         return this;
     }
 
-    /** @return the type of the message (ie. error, get, etc) */
+    /**
+     * @return the type of the message (ie. error, get, etc)
+     */
     public String getType() {
         return type;
     }
 
-    /** sets the type for the message.  If the type is null, type will be not be */
+    /**
+     * sets the type for the message.  If the type is null, type will be not be
+     */
     public void setType(String type) {
         this.type = type;
         if (type != null)
@@ -61,12 +61,16 @@ abstract public class AbstractJabberMessage extends JabberJDOMMessage {
             getDOM().removeAttribute("type", getDOM().getNamespace());
     }
 
-    /** @return the JID of the recipient */
+    /**
+     * @return the JID of the recipient
+     */
     public JID getTo() {
         return to;
     }
 
-    /** sets the recipient of the message */
+    /**
+     * sets the recipient of the message
+     */
     public void setTo(JID to) {
         this.to = to;
         if (to != null)
@@ -75,7 +79,9 @@ abstract public class AbstractJabberMessage extends JabberJDOMMessage {
             getDOM().removeAttribute("to", getDOM().getNamespace());
     }
 
-    /** @return the from attribute of the message */
+    /**
+     * @return the from attribute of the message
+     */
     public JID getFrom() {
         return from;
     }
@@ -83,6 +89,7 @@ abstract public class AbstractJabberMessage extends JabberJDOMMessage {
     /**
      * sets the originator of the message.  Normally, this is used to set the incoming message.  Outgoing messages
      * will normally not use this because the server will automatically append this field for you.
+     *
      * @param from the originator of the message
      */
     public void setFrom(JID from) {
@@ -98,13 +105,14 @@ abstract public class AbstractJabberMessage extends JabberJDOMMessage {
      * convenience sake).  It will first check to see if the message itself is an error message.  If it
      * is, it will return itself as the error.  If it is not an error, then it will check to see if its
      * reply message is an error message (if a reply exists).  If it is, it will use its reply message as the error message.
+     *
      * @return true if either the message itself or its reply message is an error message
      */
     public boolean isError() {
         if (TYPE_ERROR.equals(type))
             return true;
         //check if reply is an error message (if it exists)
-        AbstractJabberMessage reply = (AbstractJabberMessage)getReplyMessage();
+        AbstractJabberMessage reply = (AbstractJabberMessage) getReplyMessage();
         if ((reply != null) && (reply.isError())) return true;
         return false;
     }
@@ -114,11 +122,12 @@ abstract public class AbstractJabberMessage extends JabberJDOMMessage {
      * If the message itself is an error, it will return itself as the error message.  Otherwise,
      * it will check if its reply message (if a reply exists) is an error message, and if so, use the
      * reply message as the error message. This is purely for convenience sake.
+     *
      * @return the error message either from itself or from its reply message, null if no error message
      */
     public ErrorMessage getErrorMessage() {
         if (errorMessage != null) return errorMessage;
-        AbstractJabberMessage reply = (AbstractJabberMessage)getReplyMessage();
+        AbstractJabberMessage reply = (AbstractJabberMessage) getReplyMessage();
         //check to make sure it's an error message
         if ((!TYPE_ERROR.equals(type)) && (reply == null)) return null;
         //it's an error, retrieve the error element
@@ -146,6 +155,7 @@ abstract public class AbstractJabberMessage extends JabberJDOMMessage {
      * sets the error message.  The message type will automatically be changed to TYPE_ERROR.
      * You can still include any other data along with the error message, but the error message
      * will be returned and the type is now TYPE_ERROR.
+     *
      * @param msg the error message associated with this message
      */
     public void setErrorMessage(ErrorMessage msg) {

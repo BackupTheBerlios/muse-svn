@@ -10,7 +10,12 @@ import org.jdom.Namespace;
  * canonical names associated with each number.  The numbers are assigned arbitrarily for internal message processing
  * use and is subject to change without notice.
  */
-public class JabberCode {
+public interface JabberCode {
+    //namespaces for the main stream as well as error stanzas
+    public static final Namespace XMLNS_STREAM = Namespace.getNamespace("http://etherx.jabber.org/streams");
+    public static final Namespace XMLNS_ERROR_STREAM = Namespace.getNamespace("urn:ietf:params:xml:ns:xmpp-streams");
+    public static final Namespace XMLNS_ERROR_STANZA = Namespace.getNamespace("urn:ietf:params:xml:ns:xmpp-stanzas");
+
     //the namespaces used by each message
     public static final Namespace XMLNS_IQ = Namespace.getNamespace("jabber:client");
     public static final Namespace XMLNS_PRESENCE = Namespace.getNamespace("jabber:client");

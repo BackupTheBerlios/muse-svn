@@ -1,5 +1,6 @@
 package com.echomine.gnutella.impl;
 
+import alt.java.net.Socket;
 import com.echomine.gnutella.GnutellaConnection;
 import com.echomine.gnutella.GnutellaProtocolType;
 import com.echomine.gnutella.RawDataReceivable;
@@ -9,7 +10,6 @@ import com.echomine.util.IOUtil;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
 
 /** The connector protocol will handle outgoing gnutella client connection handshakes. */
 public class GnutellaConnectorProtocolV04 extends AbstractGnutellaProtocol {

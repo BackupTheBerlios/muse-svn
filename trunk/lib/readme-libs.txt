@@ -18,18 +18,13 @@ commons-logging.jar (1.0.3)
 crimson-1.1.3.jar (1.1.3)
 - optional if other JAXP parser is used
 
-jakarta-oro.jar (2.0.7)
+jakarta-oro.jar (2.0.8)
 - required for jabber module
 - optional for gnutella
 
 jdom.jar (b9)
 - required for jabber module
 - optional for gnutella
-
-jsse.jar
-- required for jabber module that will be using SSL options
-- optional if Java Runtime is 1.4 or above
-- optional if not using SSL options
 
 log4j.jar (1.2.8)
 - required if not using JDK 1.4 or above

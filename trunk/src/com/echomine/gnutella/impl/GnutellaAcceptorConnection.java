@@ -1,5 +1,6 @@
 package com.echomine.gnutella.impl;
 
+import alt.java.net.Socket;
 import com.echomine.gnutella.GnutellaConnectionEvent;
 import com.echomine.gnutella.GnutellaConnectionModel;
 import com.echomine.gnutella.GnutellaContext;
@@ -9,7 +10,6 @@ import com.echomine.net.HandshakeFailedException;
 import com.echomine.util.IOUtil;
 
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * The acceptor connection is used to create a connection object for an incoming connection.  Since the connection is already

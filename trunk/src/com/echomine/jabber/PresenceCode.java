@@ -4,7 +4,7 @@ package com.echomine.jabber;
  * contains a set of types that are used by the Presence message.  This is here to be for convenience
  * since it uses more descriptive "words" to describe the types of commands
  */
-public class PresenceCode {
+public interface PresenceCode {
     public final static String SHOW_ONLINE = "online";
     public final static String SHOW_CHAT = "chat";
     public final static String SHOW_AWAY = "away";

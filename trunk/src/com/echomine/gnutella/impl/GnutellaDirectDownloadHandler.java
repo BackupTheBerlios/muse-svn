@@ -1,18 +1,18 @@
 package com.echomine.gnutella.impl;
 
+import alt.java.net.Socket;
 import com.echomine.gnutella.GnutellaContext;
 import com.echomine.gnutella.GnutellaFileHandler;
 import com.echomine.gnutella.GnutellaFileModel;
+import com.echomine.net.FileEvent;
 import com.echomine.net.TransferRateThrottler;
 import com.echomine.net.TransferVetoException;
-import com.echomine.net.FileEvent;
 import com.echomine.util.HTTPRequestHeader;
 import com.echomine.util.HTTPResponseHeader;
 import com.echomine.util.IOUtil;
 import org.apache.oro.text.perl.Perl5Util;
 
 import java.io.*;
-import java.net.Socket;
 
 /**
  * Implementation of the underlying layer that does the connection and handshaking with the remote host to download a file.
@@ -93,7 +93,7 @@ public class GnutellaDirectDownloadHandler extends GnutellaFileHandler {
                 filemodel.setFilesize(Integer.parseInt(contentLength));
                 contentHeaderFound = true;
             } else if (contentRange != null && httpContentRangeHeaderRE.match("m#^bytes=(\\d+)-(\\d+)/(\\d+)#i",
-                contentRange)) {
+                    contentRange)) {
                 //match "HTTP 200 OK" header information
                 //set file size
                 filemodel.setFilesize(Integer.parseInt(httpContentRangeHeaderRE.group(3)));

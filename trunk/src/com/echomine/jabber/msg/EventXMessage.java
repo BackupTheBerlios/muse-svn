@@ -1,13 +1,13 @@
 package com.echomine.jabber.msg;
 
 import com.echomine.common.ParseException;
-import com.echomine.jabber.JabberJDOMMessage;
 import com.echomine.jabber.JabberCode;
+import com.echomine.jabber.JabberJDOMMessage;
 import com.echomine.jabber.JabberMessage;
 import com.echomine.jabber.JabberMessageParser;
+import org.jdom.Element;
 
 import java.util.List;
-import org.jdom.Element;
 
 /**
  * <p>This class supports the jabber:x:event namespace.  It gives the ability to work
@@ -36,7 +36,7 @@ import org.jdom.Element;
  * time period, you should submit another event message that contains only the message id (but no events).</p>
  * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0022.html">JEP-0022 Version 1.1</a></b></p>
  */
-public class EventXMessage extends JabberJDOMMessage {
+public class EventXMessage extends JabberJDOMMessage implements JabberCode {
     public static final String EVENT_OFFLINE = "offline";
     public static final String EVENT_DELIVERED = "delivered";
     public static final String EVENT_COMPOSING = "composing";
@@ -47,9 +47,11 @@ public class EventXMessage extends JabberJDOMMessage {
     private boolean displayed;
     private String msgID;
 
-    /** constructs a default Delay message (with the x element) */
+    /**
+     * constructs a default Delay message (with the x element)
+     */
     public EventXMessage() {
-        super(new Element("x", JabberCode.XMLNS_X_EVENT));
+        super(new Element("x", XMLNS_X_EVENT));
     }
 
     /**
@@ -64,6 +66,7 @@ public class EventXMessage extends JabberJDOMMessage {
     /**
      * retrieves the sender's message ID associated with the event.  This is NOT
      * the message ID of the message itself since X Messages never use those message ID's.
+     *
      * @return the event message ID or null if none exists
      */
     public String getEventMessageID() {
@@ -129,7 +132,9 @@ public class EventXMessage extends JabberJDOMMessage {
         this.delivered = delivered;
     }
 
-    /** parses out the data from the message */
+    /**
+     * parses out the data from the message
+     */
     public JabberMessage parse(JabberMessageParser parser, Element msgTree) throws ParseException {
         super.parse(parser, msgTree);
         //check for existence of the events
@@ -137,7 +142,7 @@ public class EventXMessage extends JabberJDOMMessage {
         int len = list.size();
         Element event;
         for (int i = 0; i < len; i++) {
-            event = (Element)list.get(i);
+            event = (Element) list.get(i);
             if (event.getName().equals(EVENT_OFFLINE))
                 offline = true;
             else if (event.getName().equals(EVENT_DELIVERED))
@@ -162,19 +167,19 @@ public class EventXMessage extends JabberJDOMMessage {
         //remove any children first
         x.getChildren().clear();
         if (displayed)
-            x.addContent(new Element("displayed", JabberCode.XMLNS_X_EVENT));
+            x.addContent(new Element("displayed", XMLNS_X_EVENT));
         if (delivered)
-            x.addContent(new Element("delivered", JabberCode.XMLNS_X_EVENT));
+            x.addContent(new Element("delivered", XMLNS_X_EVENT));
         if (composing)
-            x.addContent(new Element("composing", JabberCode.XMLNS_X_EVENT));
+            x.addContent(new Element("composing", XMLNS_X_EVENT));
         if (offline)
-            x.addContent(new Element("offline", JabberCode.XMLNS_X_EVENT));
+            x.addContent(new Element("offline", XMLNS_X_EVENT));
         if (msgID != null)
-            x.addContent((new Element("displayed", JabberCode.XMLNS_X_EVENT)).addContent(msgID));
+            x.addContent((new Element("displayed", XMLNS_X_EVENT)).addContent(msgID));
         return super.encode();
     }
 
     public int getMessageType() {
-        return JabberCode.MSG_X_EVENT;
+        return MSG_X_EVENT;
     }
 }

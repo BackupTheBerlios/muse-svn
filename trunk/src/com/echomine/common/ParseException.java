@@ -1,12 +1,21 @@
 package com.echomine.common;
 
-/** any problem while parsing anything can throw this exception. */
+/**
+ * any problem while parsing anything can throw this exception.
+ */
 public class ParseException extends Exception {
     public ParseException() {
-        super();
     }
 
-    public ParseException(String error) {
-        super(error);
+    public ParseException(String message) {
+        super(message);
+    }
+
+    public ParseException(Throwable cause) {
+        super(cause);
+    }
+
+    public ParseException(String message, Throwable cause) {
+        super(message, cause);
     }
 }

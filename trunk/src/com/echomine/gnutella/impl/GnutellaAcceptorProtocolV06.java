@@ -1,5 +1,6 @@
 package com.echomine.gnutella.impl;
 
+import alt.java.net.Socket;
 import com.echomine.gnutella.GnutellaConnection;
 import com.echomine.gnutella.GnutellaContext;
 import com.echomine.gnutella.GnutellaProtocolType;
@@ -11,7 +12,6 @@ import com.echomine.util.HTTPResponseHeader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
 
 /**
  * The acceptor protocol will handle incoming connection handshakes.  This will be used by a listening server to

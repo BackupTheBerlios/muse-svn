@@ -14,9 +14,10 @@ import java.util.Calendar;
  * For now, vacation message have a defined disco namespace.  Thus, it will be used for now
  * until otherwise specified in the JEP.
  * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0109.html">JEP-0109 Version 0.2</a></b></p>
+ *
  * @since 0.8a4
  */
-public class VacationIQMessage extends JabberIQMessage {
+public class VacationIQMessage extends JabberIQMessage implements JabberCode {
     private String vacationMessage = "";
     private Calendar startDate;
     private Calendar endDate;
@@ -28,10 +29,12 @@ public class VacationIQMessage extends JabberIQMessage {
      */
     public VacationIQMessage(String type) {
         super(type);
-        getDOM().addContent(new Element("query", JabberCode.XMLNS_IQ_VACATION));
+        getDOM().addContent(new Element("query", XMLNS_IQ_VACATION));
     }
 
-    /** sets the default to be of iq type "get" */
+    /**
+     * sets the default to be of iq type "get"
+     */
     public VacationIQMessage() {
         this(TYPE_GET);
     }
@@ -47,8 +50,9 @@ public class VacationIQMessage extends JabberIQMessage {
 
     /**
      * Convenience method to create a vacation message that allows you to set your vacation message.
-     * @param startDate the starting date, can be null
-     * @param endDate the ending date, can be null
+     *
+     * @param startDate       the starting date, can be null
+     * @param endDate         the ending date, can be null
      * @param vacationMessage the vacation message, or null or empty if none
      */
     public static VacationIQMessage createSetVacationMessage(Calendar startDate, Calendar endDate, String vacationMessage) {
@@ -71,6 +75,7 @@ public class VacationIQMessage extends JabberIQMessage {
      * the ending date for the vacation message.  The returned datetime is in the timezone that is
      * contained inside the calendar.  If you need to show it in your own current timezone, you must
      * convert the date returned by this method.
+     *
      * @return the starting date of the vacation, or null if it has not been set
      */
     public Calendar getStartDate() {
@@ -81,6 +86,7 @@ public class VacationIQMessage extends JabberIQMessage {
      * the ending date for the vacation message.  The returned datetime is in the timezone that is
      * contained inside the calendar.  If you need to show it in your own current timezone, you must
      * convert the date returned by this method.
+     *
      * @return the ending date of the vacation, or null if it has not been set
      */
     public Calendar getEndDate() {
@@ -94,7 +100,9 @@ public class VacationIQMessage extends JabberIQMessage {
         return vacationMessage;
     }
 
-    /** sets the vacation message.  If null is passed in, the vacation message will be set to an empty string. */
+    /**
+     * sets the vacation message.  If null is passed in, the vacation message will be set to an empty string.
+     */
     public void setVacationMessage(String vacationMessage) {
         if (vacationMessage == null)
             this.vacationMessage = "";
@@ -102,12 +110,16 @@ public class VacationIQMessage extends JabberIQMessage {
             this.vacationMessage = vacationMessage;
     }
 
-    /** sets the start date for the vacation message */
+    /**
+     * sets the start date for the vacation message
+     */
     public void setStartDate(Calendar startDate) {
         this.startDate = startDate;
     }
 
-    /** sets the end date for the vacation message */
+    /**
+     * sets the end date for the vacation message
+     */
     public void setEndDate(Calendar endDate) {
         this.endDate = endDate;
     }
@@ -118,14 +130,14 @@ public class VacationIQMessage extends JabberIQMessage {
     public JabberMessage parse(JabberMessageParser parser, Element msgTree) throws ParseException {
         super.parse(parser, msgTree);
         //parse out the iq message data
-        Element query = msgTree.getChild("query", JabberCode.XMLNS_IQ_VACATION);
+        Element query = msgTree.getChild("query", XMLNS_IQ_VACATION);
         //check to make sure that there is a query tag
         if (query != null) {
-            String temp = query.getChildText("start", JabberCode.XMLNS_IQ_VACATION);
+            String temp = query.getChildText("start", XMLNS_IQ_VACATION);
             if (temp != null) setStartDate(JabberUtil.parseDateTime(temp));
-            temp = query.getChildText("end", JabberCode.XMLNS_IQ_VACATION);
+            temp = query.getChildText("end", XMLNS_IQ_VACATION);
             if (temp != null) setEndDate(JabberUtil.parseDateTime(temp));
-            temp = query.getChildText("message", JabberCode.XMLNS_IQ_VACATION);
+            temp = query.getChildText("message", XMLNS_IQ_VACATION);
             setVacationMessage(temp);
         }
         return this;
@@ -133,6 +145,7 @@ public class VacationIQMessage extends JabberIQMessage {
 
     /**
      * encodes the data in this object into XML string
+     *
      * @return the xml string
      */
     public String encode() throws ParseException {
@@ -140,19 +153,21 @@ public class VacationIQMessage extends JabberIQMessage {
         Element x = getDOM();
         //remove any children
         x.getChildren().clear();
-        Element query = new Element("query", JabberCode.XMLNS_IQ_VACATION);
+        Element query = new Element("query", XMLNS_IQ_VACATION);
         if (startDate != null)
-            query.addContent(new Element("start", JabberCode.XMLNS_IQ_VACATION).addContent(JabberUtil.formatDateTime(startDate)));
+            query.addContent(new Element("start", XMLNS_IQ_VACATION).addContent(JabberUtil.formatDateTime(startDate)));
         if (endDate != null)
-            query.addContent(new Element("end", JabberCode.XMLNS_IQ_VACATION).addContent(JabberUtil.formatDateTime(endDate)));
+            query.addContent(new Element("end", XMLNS_IQ_VACATION).addContent(JabberUtil.formatDateTime(endDate)));
         if (vacationMessage != null)
-            query.addContent(new Element("message", JabberCode.XMLNS_IQ_VACATION).addContent(vacationMessage));
+            query.addContent(new Element("message", XMLNS_IQ_VACATION).addContent(vacationMessage));
         x.addContent(query);
         return super.encode();
     }
 
-    /** @return the message type */
+    /**
+     * @return the message type
+     */
     public int getMessageType() {
-        return JabberCode.MSG_IQ_VACATION;
+        return MSG_IQ_VACATION;
     }
 }

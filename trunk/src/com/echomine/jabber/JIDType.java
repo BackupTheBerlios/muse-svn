@@ -21,7 +21,7 @@ import java.util.List;
  */
 public class JIDType {
     private static Pattern cattypePat;
-    private static Log log = LogFactory.getLog(JID.class);
+    private static Log log = LogFactory.getLog(JIDType.class);
     private String category;
     private String subtype;
     private JID jid;
@@ -42,6 +42,7 @@ public class JIDType {
     /**
      * the constructor takes a category/subtype pair string and will parse it
      * into its distinctive parts.  The types are listed in JIDTypeCode.
+     *
      * @throws ParseException if the parsing of the category/subtype errored
      */
     public JIDType(String type) throws ParseException {
@@ -61,7 +62,9 @@ public class JIDType {
         this.subtype = subtype;
     }
 
-    /** retrieves the entire JID type in the form of "category/subtype" */
+    /**
+     * retrieves the entire JID type in the form of "category/subtype"
+     */
     public String getJIDType() {
         StringBuffer buf = new StringBuffer();
         buf.append(category).append("/");
@@ -70,27 +73,37 @@ public class JIDType {
         return buf.toString();
     }
 
-    /** @return the primary category of the type */
+    /**
+     * @return the primary category of the type
+     */
     public String getCategory() {
         return category;
     }
 
-    /** sets the category for the type.  The type is in the format of category/subtype. */
+    /**
+     * sets the category for the type.  The type is in the format of category/subtype.
+     */
     public void setCategory(String category) {
         this.category = category;
     }
 
-    /** @return the subtype for the type, null if there is none */
+    /**
+     * @return the subtype for the type, null if there is none
+     */
     public String getSubtype() {
         return subtype;
     }
 
-    /** sets the subtype for the type. */
+    /**
+     * sets the subtype for the type.
+     */
     public void setSubtype(String subtype) {
         this.subtype = subtype;
     }
 
-    /** @return the JID of the type, null if empty */
+    /**
+     * @return the JID of the type, null if empty
+     */
     public JID getJID() {
         return jid;
     }
@@ -104,17 +117,23 @@ public class JIDType {
         this.jid = jid;
     }
 
-    /** @return the common user-recognizable name for the type if there is one, null otherwise */
+    /**
+     * @return the common user-recognizable name for the type if there is one, null otherwise
+     */
     public String getName() {
         return name;
     }
 
-    /** sets the common name for the JID type for easier recognition. */
+    /**
+     * sets the common name for the JID type for easier recognition.
+     */
     public void setName(String name) {
         this.name = name;
     }
 
-    /** adds a child to the type.  This will be under the type */
+    /**
+     * adds a child to the type.  This will be under the type
+     */
     public void addChild(JIDType child) {
         if (children == null)
             children = new ArrayList();
@@ -141,7 +160,9 @@ public class JIDType {
         return children;
     }
 
-    /** retrieves the namespaces that the type supports.  If there are no namespaces, then the returned value will be null. */
+    /**
+     * retrieves the namespaces that the type supports.  If there are no namespaces, then the returned value will be null.
+     */
     public List getNSList() {
         return nsList;
     }
@@ -175,17 +196,23 @@ public class JIDType {
             if (child.getName().equals("ns")) {
                 addNS(Namespace.getNamespace(child.getText()));
             } else {
-                //all the others elements are simply more JID Types
-                //let's just do recursive parse.
-                subChild = new JIDType(child.getName(), child.getAttributeValue("type"));
-                subChild.parse(child);
-                //add the child into the children list
-                addChild(subChild);
+                try {
+                    //all the others elements are simply more JID Types
+                    //let's just do recursive parse.
+                    subChild = new JIDType(child.getName(), child.getAttributeValue("type"));
+                    subChild.parse(child);
+                    //add the child into the children list
+                    addChild(subChild);
+                } catch (ParseException ex) {
+                    if (log.isWarnEnabled()) log.warn("The current browse JIDType cannot be parsed and is skipped.  Service name = " + name + ", jid = " + jid);
+                }
             }
         }
     }
 
-    /** Creates a DOM structure that represents all the data contained within this type */
+    /**
+     * Creates a DOM structure that represents all the data contained within this type
+     */
     public Element getDOM() throws ParseException {
         if (category == null)
             throw new ParseException("JIDType category must be set");

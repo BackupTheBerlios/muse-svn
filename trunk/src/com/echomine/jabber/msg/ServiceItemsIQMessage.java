@@ -25,7 +25,8 @@ import java.util.List;
  * see what happens.</p>
  * <p>Read up on the list of categories, namespaces, and types at the Jabber Registry for an up-to-date list that
  * you may use.  The registrar is located at <a href="http://www.jabber.org/registrar/">http://www.jabber.org/registrar/</a></p>
- * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0030.html">JEP-0030 Version 1.0</a></b></p>
+ * <p><b>Current Implementation: <a href="http://www.jabber.org/jeps/jep-0030.html">JEP-0030 Version 2.0</a></b></p>
+ *
  * @see ServiceInfoIQMessage
  * @since 0.8a4
  */
@@ -34,7 +35,9 @@ public class ServiceItemsIQMessage extends JabberIQMessage {
     private ArrayList items = new ArrayList();
     private String node;
 
-    /** defaults to iq type get for retrieval or for parsing incoming messages */
+    /**
+     * defaults to iq type get for retrieval or for parsing incoming messages
+     */
     public ServiceItemsIQMessage(String type) {
         super(type);
         //add in the query element
@@ -45,13 +48,16 @@ public class ServiceItemsIQMessage extends JabberIQMessage {
         this(TYPE_GET);
     }
 
-    /** @return the message type id */
+    /**
+     * @return the message type id
+     */
     public int getMessageType() {
         return JabberCode.MSG_IQ_DISCO_ITEMS;
     }
 
     /**
      * Adds a new service item to the message
+     *
      * @param serviceItem a service item
      */
     public void addItem(ServiceItem serviceItem) {
@@ -60,20 +66,25 @@ public class ServiceItemsIQMessage extends JabberIQMessage {
         items.add(serviceItem);
     }
 
-    /** @return a non-modifiable list of ServiceItem objects */
+    /**
+     * @return a non-modifiable list of ServiceItem objects
+     */
     public List getItems() {
         return Collections.unmodifiableList(items);
     }
 
     /**
      * sets the node name so that further subnode items can be retrieved.
+     *
      * @param node the node name to query further
      */
     public void setNode(String node) {
         this.node = node;
     }
 
-    /** @return the node name of the message if available, null otherwise */
+    /**
+     * @return the node name of the message if available, null otherwise
+     */
     public String getNode() {
         return node;
     }
