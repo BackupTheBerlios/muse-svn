@@ -10,8 +10,6 @@
         <pathelement location="${build.dest}"/>
         <pathelement location="${build.test.dir}/classes"/>
         <pathelement location="${junit.jar}"/>
-        <pathelement location="${ant.jar}"/>
-        <pathelement location="${ant-optional.jar}"/>
     </path>
 
     <!-- ========== Executable Targets ======================================== -->

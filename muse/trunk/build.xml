@@ -82,6 +82,11 @@
     <target name="jar" depends="compile">
         <jar jarfile="${work.dir}/${jar.name}">
             <fileset dir="${build.dest}"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="Muse"/>
+                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Implementation-Vendor" value="Echomine Inc."/>
+            </manifest>
         </jar>
     </target>
 
@@ -99,6 +104,11 @@
     <target name="jar-examples" depends="compile-examples">
         <jar jarfile="${work.dir}/${jar.examples.name}">
             <fileset dir="${build.examples.dir}/classes"/>
+            <manifest>
+                <attribute name="Implementation-Title" value="Muse Examples"/>
+                <attribute name="Implementation-Version" value="${version}"/>
+                <attribute name="Implementation-Vendor" value="Echomine Inc."/>
+            </manifest>
         </jar>
     </target>
 
