@@ -2,6 +2,7 @@
 Build time
 ==================
 junit.jar (3.8.1)
+mockobjects (0.09)
 
 ==================
 Runtime
@@ -14,7 +15,7 @@ commons-logging.jar (1.0.4)
 - required
 
 jdom.jar (1.0)
-- required for jabber module
+- required
 
 log4j.jar (1.2.9)
 - required if not using JDK 1.4 or above
