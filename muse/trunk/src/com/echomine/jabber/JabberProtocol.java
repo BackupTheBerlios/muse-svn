@@ -17,7 +17,7 @@ import java.io.*;
  * is that when incoming xml message comes in, it will select the proper message processor to parse the rest of the data.
  */
 public class JabberProtocol implements SocketHandler {
-    public final static String DEFAULT_PARSER = "com.echomine.jabber.parser.JabberCrimsonParser";
+    public final static String DEFAULT_PARSER = "com.echomine.jabber.parser.JabberJAXPParser";
     protected final static int SOCKETBUF = 8192;
     private static Log outlogger = LogFactory.getLog("jabber/msg/outgoing");
     private boolean shutdown;

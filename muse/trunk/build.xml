@@ -179,28 +179,6 @@
     <target name="package-all" depends="package-zip, package-tgz">
     </target>
 
-    <!-- =================================================== -->
-    <!-- Packages the specific modules themselves into jars  -->
-    <!-- =================================================== -->
-    <target name="jar-jabber" depends="compile">
-        <jar jarfile="${work.dir}/${jar.jabber.name}">
-            <fileset dir="${build.dest}">
-                <patternset refid="common-files"/>
-                <include name="com/echomine/jabber/**"/>
-                <include name="com/echomine/xmlrpc/**"/>
-            </fileset>
-        </jar>
-    </target>
-
-    <target name="jar-gnutella" depends="compile">
-        <jar jarfile="${work.dir}/${jar.gnutella.name}">
-            <fileset dir="${build.dest}">
-                <patternset refid="common-files"/>
-                <include name="com/echomine/gnutella/**"/>
-            </fileset>
-        </jar>
-    </target>
-
     <!-- run the unit tests -->
     <target name="test.junit" depends="compile" description="Run JUnit tests">
         <ant antfile="build-tests.xml" inheritrefs="yes" target="test.junit"/>
@@ -217,8 +195,6 @@
         <delete file="${work.dir}/${dist.tgz.name}" verbose="false"/>
         <delete file="${work.dir}/${jar.name}" verbose="false"/>
         <delete file="${work.dir}/${jar.examples.name}" verbose="false"/>
-        <delete file="${work.dir}/${jar.gnutella.name}" verbose="false"/>
-        <delete file="${work.dir}/${jar.jabber.name}" verbose="false"/>
         <delete dir="${build.dir}"/>
         <delete dir="${build.examples.dir}"/>
         <delete dir="${work.dir}/docs"/>

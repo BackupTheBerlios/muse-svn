@@ -39,6 +39,12 @@ public class JabberTest {
     public static void main(String[] args) {
         if (args.length < 3) {
             System.out.println("Usage: JabberTest <username> <password> <method to run> [<jabber server>] [<ssl{true/false}>]");
+	    System.out.println("Methods available for running: ");
+            Method[] methods = JabberTest.class.getMethods();
+	    for (int i = 0;i < methods.length;i++) {
+	        if (methods[i].getName().startsWith("test"))
+		    System.out.println("\t" + methods[i].getName());
+            }
             System.exit(1);
         }
         String server = "jabber.org";
@@ -307,7 +313,7 @@ public class JabberTest {
             //change password
             String time = session.getServerService().getServerTime();
             String version = session.getServerService().getServerVersion();
-            String localTime = session.getServerService().getServerTimeInLocal().toString();
+            String localTime = session.getServerService().getServerTimeInLocal();
             long uptime = session.getServerService().getServerUptime();
             System.out.println("Server Time (Local): " + localTime);
             System.out.println("Server Time (Server): " + time);

@@ -5,11 +5,12 @@ releases (ie. 0.7, 0.8, etc).  Previous major version changelogs will be with
 its respective release archive.
 
 =========================================================================
-Version 0.8b1
+Version 0.81
 =========================================================================
 --------------------
-Gnutella Module
+Gnutella Module -- OBSOLETE
 --------------------
+OBSOLETE -- As of this version, Gnutella is officially removed from Muse.
 Fixed -- typo for GnutellaConnection.getVendorFeatureHeaders() (originally it was spelled
   getVendorFeartureHeaders()).
 Fixed -- NPE error when host restricted callback handler is not set.
@@ -51,6 +52,7 @@ Modified -- the constructor signature for XMLRPC Response class to accept a Seri
 Modified -- (MUS-80) Modified ErrorMessage to conform to JEP-0086, making the error message stanza XMPP compliant.
 Modified -- (MUS-81) Changed JabberCode and PresenceCode to interfaces.  Modified a large number of classes
   to implement JabberCode.
+Fixed -- some JabberServerService methods were throwing NPEs.
 
 --------------------
 Echomine General/Utils/Network

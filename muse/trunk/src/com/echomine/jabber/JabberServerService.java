@@ -29,6 +29,7 @@ public class JabberServerService {
         msg.setSynchronized(true);
         msg.setTo(session.getContext().getServerNameJID());
         session.sendMessage(msg);
+	if (msg.isError()) return null;
         TimeIQMessage reply = (TimeIQMessage) msg.getReplyMessage();
         if (reply != null)
             return reply.getTimeInLocal().toString();
@@ -46,6 +47,7 @@ public class JabberServerService {
         msg.setSynchronized(true);
         msg.setTo(session.getContext().getServerNameJID());
         session.sendMessage(msg);
+	if (msg.isError()) return null;
         TimeIQMessage reply = (TimeIQMessage) msg.getReplyMessage();
         if (reply != null)
             return reply.getDisplay().toString();
@@ -62,6 +64,7 @@ public class JabberServerService {
         msg.setSynchronized(true);
         msg.setTo(session.getContext().getServerNameJID());
         session.sendMessage(msg);
+	if (msg.isError()) return null;
         VersionIQMessage reply = (VersionIQMessage) msg.getReplyMessage();
         String version = null;
         if (reply != null)
@@ -78,6 +81,7 @@ public class JabberServerService {
         msg.setTo(session.getContext().getServerNameJID());
         msg.setSynchronized(true);
         session.sendMessage(msg);
+	if (msg.isError()) return -1;
         LastIQMessage reply = (LastIQMessage) msg.getReplyMessage();
         if (reply != null)
             return reply.getSeconds();
@@ -105,6 +109,7 @@ public class JabberServerService {
         msg.setTo(session.getContext().getServerNameJID());
         //send the message
         session.sendMessage(msg);
+	if (msg.isError()) return null;
         //obtain the reply
         AgentsIQMessage reply = (AgentsIQMessage) msg.getReplyMessage();
         if (reply != null)
