@@ -1,9 +1,9 @@
 package com.echomine.jabber;
 
 import com.echomine.common.ParseException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.oro.text.regex.*;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Contains the JID resource.  It also knows how to parse the information or output
@@ -11,37 +11,26 @@ import org.apache.oro.text.regex.*;
  * pass in the JID string, and then retrieve whatever you like.
  */
 public class JID {
-    private static Pattern jidPat;
-    private static Log log = LogFactory.getLog(JID.class);
+    private static Pattern jidPat = Pattern.compile("(?:(.+)\\@)?([^/]+)(?:/(.+))?");
 
     private String node;
     private String host;
     private String resource;
 
-    static {
-        Perl5Compiler compiler = new Perl5Compiler();
-        try {
-            jidPat = compiler.compile("(?:(.+)\\@)?([^/]+)(?:/(.+))?");
-        } catch (MalformedPatternException ex) {
-            if (log.isWarnEnabled())
-                log.warn("JID Regular Expression did not compile properly", ex);
-        }
-    }
-
     /**
      * takes in a JID and then parses it into different parts.
+     *
      * @throws ParseException if the jid does not conform to the format
      */
     public JID(String jid) throws ParseException {
         if (jid == null) throw new ParseException("JID is null and cannot be parsed");
         //URI Syntax is [node@]domain[/resource]
-        Perl5Matcher matcher = new Perl5Matcher();
-        if (matcher.matches(jid, jidPat)) {
+        Matcher matcher = jidPat.matcher(jid);
+        if (matcher.matches()) {
             //retrieve the info
-            MatchResult result = matcher.getMatch();
-            this.node = result.group(1);
-            this.host = result.group(2);
-            this.resource = result.group(3);
+            this.node = matcher.group(1);
+            this.host = matcher.group(2);
+            this.resource = matcher.group(3);
         } else {
             throw new ParseException("JID has incorrect format: " + jid);
         }
@@ -49,8 +38,9 @@ public class JID {
 
     /**
      * takes in a set of information to create the JID object that can be use to convert into a JID string
-     * @param node the name of the node or user, required
-     * @param host the Jabber server name, required
+     *
+     * @param node     the name of the node or user, required
+     * @param host     the Jabber server name, required
      * @param resource the resource used, can be null to specify none
      */
     public JID(String node, String host, String resource) {
@@ -71,7 +61,9 @@ public class JID {
         return resource;
     }
 
-    /** this is the same as getNode(). It's here for less confusion and convenience. */
+    /**
+     * this is the same as getNode(). It's here for less confusion and convenience.
+     */
     public String getUsername() {
         return getNode();
     }
@@ -79,13 +71,16 @@ public class JID {
     /**
      * retrieves the node@domain part of the JID.  It is basically the normal JID that you
      * would use if you do not specify a resource.  This is here for convenience.
+     *
      * @return the node@domain part of the JID
      */
     public String getJIDWithoutResource() {
         return node + "@" + host;
     }
 
-    /** @return the JID in the correct format */
+    /**
+     * @return the JID in the correct format
+     */
     public String toString() {
         StringBuffer buf = new StringBuffer();
         if (node != null)

@@ -2,10 +2,7 @@ package com.echomine.util;
 
 import junit.framework.TestCase;
 
-import java.io.InputStream;
 import java.io.IOException;
-
-import com.echomine.util.IOUtil;
 
 /**
  * Tests the utility methods inside the IOUtil class

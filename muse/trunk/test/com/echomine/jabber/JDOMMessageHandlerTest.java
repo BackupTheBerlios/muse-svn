@@ -1,6 +1,6 @@
 package com.echomine.jabber;
 
-import com.echomine.jabber.parser.JabberCrimsonParser;
+import com.echomine.jabber.parser.JabberJAXPParser;
 import junit.framework.TestCase;
 import org.xml.sax.InputSource;
 
@@ -16,6 +16,7 @@ public class JDOMMessageHandlerTest extends TestCase {
     private JabberSession session;
     private JDOMMessageHandler handler;
     private JabberContentHandler chandler;
+    private JabberErrorHandler errorHandler;
 
     protected void setUp() throws Exception {
         queue = new MessageRequestQueue();
@@ -27,6 +28,7 @@ public class JDOMMessageHandlerTest extends TestCase {
         session = jabber.createSession(ctx);
         handler = new JDOMMessageHandler(msgParser);
         chandler = new JabberContentHandler(session, receiver, queue, handler);
+        errorHandler = new JabberErrorHandler();
     }
 
     /**
@@ -36,8 +38,8 @@ public class JDOMMessageHandlerTest extends TestCase {
     public void testParseAndFireMsgSessionInit() throws Exception {
         receiver.reset();
         StringReader reader = new StringReader("<stream:stream from='jabber.org' id='774455332' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'>");
-        JabberCrimsonParser parser = new JabberCrimsonParser();
-        parser.parse(false, true, chandler, null, new InputSource(reader));
+        JabberJAXPParser parser = new JabberJAXPParser();
+        parser.parse(false, true, chandler, errorHandler, new InputSource(reader));
         assertTrue(receiver.msgReceived);
         assertTrue(receiver.msg instanceof MsgSessionInit);
         MsgSessionInit msg = (MsgSessionInit) receiver.msg;
@@ -48,13 +50,14 @@ public class JDOMMessageHandlerTest extends TestCase {
     /**
      * this tests makes sure that when the ending &lt;/stream:stream> is reached, an event is NOT fired for that.
      * The ending even should simply be ignored, skipped, or cause the entire parsing to end promptly.
+     *
      * @throws Exception
      */
     public void testMsgSessionInitEndElementDoesNotFireEvent() throws Exception {
         receiver.reset();
         StringReader reader = new StringReader("<stream:stream from='jabber.org' id='774455332' xmlns='jabber:client' xmlns:stream='http://etherx.jabber.org/streams'></stream:stream>");
-        JabberCrimsonParser parser = new JabberCrimsonParser();
-        parser.parse(false, true, chandler, null, new InputSource(reader));
+        JabberJAXPParser parser = new JabberJAXPParser();
+        parser.parse(false, true, chandler, errorHandler, new InputSource(reader));
         assertEquals(1, receiver.count);
     }
 

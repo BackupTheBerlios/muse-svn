@@ -53,7 +53,11 @@ Modified -- (MUS-80) Modified ErrorMessage to conform to JEP-0086, making the er
 Modified -- (MUS-81) Changed JabberCode and PresenceCode to interfaces.  Modified a large number of classes
   to implement JabberCode.
 Fixed -- some JabberServerService methods were throwing NPEs.
-
+Modified -- All files using jakarta-oro to now use JDK 1.4's java.util.regex classes.
+Updated -- Jabber now uses JAXP as the default parser.  Normally, this means Crimson
+  will be used because it is the default XML parser packaged with JDK 1.4 (1.5
+  is a different story).
+  
 --------------------
 Echomine General/Utils/Network
 --------------------
@@ -66,16 +70,18 @@ Added -- mockobjects-alt's io and net packages for easier unit testing (v0.09). 
   Only those dealing with low level Socket work will need to import alt.java.net.Socket
   instead of java.net.Socket.  Codes and functionality should not change at all
   due to this additional implementation.
-Upgraded -- jakarta-oro from version 2.0.7 to 2.0.8.
 Upgraded -- JDOM library to 1.0
 Upgraded -- Commons-logging to 1.0.4
 Upgraded -- bsh to 2.0b2
 Upgraded -- log4j to 1.2.9
 Upgraded -- XPP3 to 1.1.3.4.M
-Removed -- jsse.jar, xml-apis.jar due to the minimum JDK 1.4+ requirement, which means that
-  JSSE is already part of the JDK.
+Removed -- jsse.jar, crimson-1.1.3.jar, xml-apis.jar due to the minimum
+  JDK 1.4+ requirement, which means that JSSE is already part of the JDK.
 Removed -- ANT libraries ant.jar, optional.jar.  Also removed ant.bat and ant.sh.
   Muse now requires an ANT distribution that is already installed on your system.
+Removed -- jakart-oro.jar. Muse now uses JDK 1.4's own java.util.regex package.
+Removed -- All HTTP* classes under util package.  These are no longer needed
+  after Gnutella module is removed. Test Cases are removed as well.
 
 =========================================================================
 Version 0.8a5

@@ -13,16 +13,8 @@ bsh.jar (2.0b2)
 commons-logging.jar (1.0.4)
 - required
 
-crimson-1.1.3.jar (1.1.3)
-- optional if other JAXP parser is used
-
-jakarta-oro.jar (2.0.8)
-- required for jabber module
-- optional for gnutella
-
 jdom.jar (1.0)
 - required for jabber module
-- optional for gnutella
 
 log4j.jar (1.2.9)
 - required if not using JDK 1.4 or above

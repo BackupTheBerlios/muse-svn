@@ -3,13 +3,14 @@ package com.echomine.jabber;
 import com.echomine.common.ParseException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.oro.text.regex.*;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * <p>a jid-type is similar to a mime-type.  It contains a category and then a subtype
@@ -20,7 +21,7 @@ import java.util.List;
  * <p>This object is not reusable once instantiated.  It is basically immutable.</p>
  */
 public class JIDType {
-    private static Pattern cattypePat;
+    private static Pattern cattypePat = Pattern.compile("(\\S+)/(\\S+)");
     private static Log log = LogFactory.getLog(JIDType.class);
     private String category;
     private String subtype;
@@ -29,16 +30,6 @@ public class JIDType {
     private ArrayList children;
     private ArrayList nsList;
 
-    static {
-        Perl5Compiler compiler = new Perl5Compiler();
-        try {
-            cattypePat = compiler.compile("(\\S+)/(\\S+)");
-        } catch (MalformedPatternException ex) {
-            if (log.isWarnEnabled())
-                log.warn("JID Regular Expression did not compile properly", ex);
-        }
-    }
-
     /**
      * the constructor takes a category/subtype pair string and will parse it
      * into its distinctive parts.  The types are listed in JIDTypeCode.
@@ -46,12 +37,11 @@ public class JIDType {
      * @throws ParseException if the parsing of the category/subtype errored
      */
     public JIDType(String type) throws ParseException {
-        Perl5Matcher matcher = new Perl5Matcher();
         //type regex is "category/subtype"
-        if (matcher.matches(type, cattypePat)) {
-            MatchResult result = matcher.getMatch();
-            category = result.group(1);
-            subtype = result.group(2);
+        Matcher matcher = cattypePat.matcher(type);
+        if (matcher.matches()) {
+            category = matcher.group(1);
+            subtype = matcher.group(2);
         } else {
             throw new ParseException("Unable to parse the category/subtype combination: " + type);
         }

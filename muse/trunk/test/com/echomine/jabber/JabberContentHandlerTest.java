@@ -3,7 +3,7 @@ package com.echomine.jabber;
 import com.echomine.jabber.msg.EventXMessage;
 import com.echomine.jabber.msg.ExpireXMessage;
 import com.echomine.jabber.msg.LastIQMessage;
-import com.echomine.jabber.parser.JabberCrimsonParser;
+import com.echomine.jabber.parser.JabberJAXPParser;
 import junit.framework.TestCase;
 import org.xml.sax.InputSource;
 
@@ -19,7 +19,8 @@ public class JabberContentHandlerTest extends TestCase {
     private Jabber jabber = new Jabber();
     private JabberContext context;
     private JabberContentHandler contentHandler;
-    private JabberCrimsonParser parser = new JabberCrimsonParser();
+    private JabberErrorHandler errorHandler;
+    private JabberJAXPParser parser = new JabberJAXPParser();
 
     public JabberContentHandlerTest(String name) {
         super(name);
@@ -35,6 +36,8 @@ public class JabberContentHandlerTest extends TestCase {
         receiver = new DefaultMessageReceiver(session);
         if (contentHandler == null)
             contentHandler = new JabberContentHandler(session, receiver, queue, new JDOMXMessageHandler(new DefaultMessageParser()));
+        if (errorHandler == null)
+            errorHandler = new JabberErrorHandler();
     }
 
     protected void tearDown() throws Exception {
@@ -47,7 +50,7 @@ public class JabberContentHandlerTest extends TestCase {
      * message properly
      */
     public void testStreamStream() {
-        String streamXML = "<stream:stream from='jabber.org' id='1234567890'></stream:stream>";
+        String streamXML = "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' from='jabber.org' id='1234567890'></stream:stream>";
         SuccessMessageListener ml = new SuccessMessageListener() {
             public void messageReceived(JabberMessageEvent event) {
                 if (event.getMessageType() == JabberCode.MSG_INIT) {
@@ -59,7 +62,7 @@ public class JabberContentHandlerTest extends TestCase {
         };
         receiver.addMessageListener(ml);
         //now start the parsing
-        parser.parse(false, true, contentHandler, null, new InputSource(new StringReader(streamXML)));
+        parser.parse(false, true, contentHandler, errorHandler, new InputSource(new StringReader(streamXML)));
         receiver.removeMessageListener(ml);
         //parsing done check success
         assertTrue(ml.success);
@@ -69,7 +72,7 @@ public class JabberContentHandlerTest extends TestCase {
      * Tests that the parsing of normal messages without any X Messages is correct
      */
     public void testMessageWithoutX() {
-        String streamXML = "<stream:stream from='jabber.org' id='1234567890'>" +
+        String streamXML = "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' from='jabber.org' id='1234567890'>" +
                 "<iq xmlns='jabber:client' from='jabber.org' to='ckchris@jabber.org/Home' type='result' id='id_10001'>" +
                 "<query xmlns='jabber:iq:last' seconds='409186'/></iq></stream:stream>";
         SuccessMessageListener ml = new SuccessMessageListener() {
@@ -83,7 +86,7 @@ public class JabberContentHandlerTest extends TestCase {
         };
         receiver.addMessageListener(ml);
         //now start the parsing
-        parser.parse(false, true, contentHandler, null, new InputSource(new StringReader(streamXML)));
+        parser.parse(false, true, contentHandler, errorHandler, new InputSource(new StringReader(streamXML)));
         receiver.removeMessageListener(ml);
         //parsing done check success
         assertTrue(ml.success);
@@ -93,7 +96,7 @@ public class JabberContentHandlerTest extends TestCase {
      * Tests message parsing that includes ONE X Message only.
      */
     public void testMessageWithOneXMessage() {
-        String streamXML = "<stream:stream from='jabber.org' id='1234567890'>" +
+        String streamXML = "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' from='jabber.org' id='1234567890'>" +
                 "<message xmlns='jabber:client' to='test@test.org' id='msg811'><subject>subject</subject>" +
                 "<body>This is the body</body>" +
                 "<x xmlns='jabber:x:expire' seconds='1800' stored='912830221'/></message></stream:stream>";
@@ -111,7 +114,7 @@ public class JabberContentHandlerTest extends TestCase {
         };
         receiver.addMessageListener(ml);
         //now start the parsing
-        parser.parse(false, true, contentHandler, null, new InputSource(new StringReader(streamXML)));
+        parser.parse(false, true, contentHandler, errorHandler, new InputSource(new StringReader(streamXML)));
         receiver.removeMessageListener(ml);
         //parsing done check success
         assertTrue(ml.success);
@@ -122,7 +125,7 @@ public class JabberContentHandlerTest extends TestCase {
      * work.
      */
     public void testMessageWithMultipleXMessages() {
-        String streamXML = "<stream:stream from='jabber.org' id='1234567890'>" +
+        String streamXML = "<stream:stream xmlns:stream='http://etherx.jabber.org/streams' from='jabber.org' id='1234567890'>" +
                 "<message xmlns='jabber:client' to='test@test.org' id='msg811'><subject>subject</subject>" +
                 "<body>This is the body</body>" +
                 "<x xmlns='jabber:x:expire' seconds='1800' stored='912830221'/>" +
@@ -143,7 +146,7 @@ public class JabberContentHandlerTest extends TestCase {
         };
         receiver.addMessageListener(ml);
         //now start the parsing
-        parser.parse(false, true, contentHandler, null, new InputSource(new StringReader(streamXML)));
+        parser.parse(false, true, contentHandler, errorHandler, new InputSource(new StringReader(streamXML)));
         receiver.removeMessageListener(ml);
         //parsing done check success
         assertTrue(ml.success);
