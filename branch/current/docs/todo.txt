@@ -1,0 +1,16 @@
+TODO
+=====
+Artificial Intelligence in host management.  What this actually
+  translates to is that the max incoming and outgoing connections will become
+  a "suggestion" rather than a hard limit.  The AI will dynamically increase
+  and decrease the number of hosts connected based on the goal of maximizing
+  the number of hosts seen over the network, taking in consideration of other
+  factors such as bandwidth (28.8k, 56k, T1, etc) and network routing
+  packets, etc.  Potentially, the AI will be able to keep to the hard limit
+  set by the developer.  However, it will always try to find hosts in such a
+  way as to increase the number of hosts you're connected to.  I'll have to
+  research into this some more, but what this means to you is that you might
+  never have to worry about the max incoming/outgoing connections any
+  longer.  All the AI needs will most likely be some initial inputs (ie.
+  bandwidth) to learn about the network conditions so that it can then begin
+  to adapt to it dynamically.
