@@ -116,7 +116,7 @@ public class JabberJDOMMessage extends JabberMessage implements JabberMessagePar
     protected XMLOutputter getXMLOutputter() {
         if (output == null) {
             output = new XMLOutputter();
-            output.setEncoding("UTF8");
+            output.getFormat().setEncoding("UTF8");
         }
         return output;
     }

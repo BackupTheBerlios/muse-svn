@@ -104,7 +104,7 @@ public class JDOMXMessageHandler extends JDOMMessageHandler {
             //end processing of <x> tag
             process = false;
         } else if (process) {
-            curElem = curElem.getParent();
+            curElem = (Element) curElem.getParent();
         } else {
             super.endElement(namespaceURI, localName, qName);
         }

@@ -1,1 +1,0 @@
-java -cp "build/ant.jar;build/optional.jar;build/junit.jar;%JAVA_HOME%/lib/tools.jar" org.apache.tools.ant.Main %1 %2 %3 %4 %5

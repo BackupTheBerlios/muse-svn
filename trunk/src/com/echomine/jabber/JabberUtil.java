@@ -178,6 +178,6 @@ public class JabberUtil {
     public static Element parseXmlStringToDOM(String xmlStr) throws IOException, JDOMException {
         SAXBuilder builder = new SAXBuilder();
         Document doc = builder.build(new InputSource(new StringReader(xmlStr)));
-        return doc.getRootElement().detach();
+        return (Element) doc.getRootElement().detach();
     }
 }

@@ -66,7 +66,7 @@ public class JDOMMessageHandler extends JabberMessageHandler {
 
     public void endElement(String namespaceURI, String localName, String qName) {
         //end element reached.. just go up one parent
-        curElem = curElem.getParent();
+        curElem = (Element) curElem.getParent();
     }
 
     public void characters(char[] ch, int start, int length) {

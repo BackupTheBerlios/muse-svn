@@ -1,18 +1,16 @@
 ==================
 Build time
 ==================
-ant.jar (1.5.4)
-ant-optional.jar (1.5.4)
 junit.jar (3.8.1)
 
 ==================
 Runtime
 ==================
 
-bsh.jar (2.0b1)
+bsh.jar (2.0b2)
 - Optional, for running examples only
 
-commons-logging.jar (1.0.3)
+commons-logging.jar (1.0.4)
 - required
 
 crimson-1.1.3.jar (1.1.3)
@@ -22,11 +20,11 @@ jakarta-oro.jar (2.0.8)
 - required for jabber module
 - optional for gnutella
 
-jdom.jar (b9)
+jdom.jar (1.0)
 - required for jabber module
 - optional for gnutella
 
-log4j.jar (1.2.8)
+log4j.jar (1.2.9)
 - required if not using JDK 1.4 or above
 - optional if using JDK 1.4's own logging system
 
@@ -37,10 +35,6 @@ muse-examples.jar (same as distribution version)
 - optional
 - required only when running examples
 
-xml-apis.jar
-- required if not using JDK 1.4 or above
-- optional if using JDK 1.4+ as all XML classes are included with 1.4+
-
-xpp3.jar (1.1.3.4-RC3)
+xpp3.jar (1.1.3.4.M)
 - optional, alternative parser for jabber module
 
