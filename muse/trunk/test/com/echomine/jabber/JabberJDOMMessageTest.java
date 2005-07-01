@@ -2,6 +2,7 @@ package com.echomine.jabber;
 
 import junit.framework.TestCase;
 import org.jdom.Element;
+import com.echomine.jabber.msg.DelayXMessage;
 
 import java.util.HashMap;
 import java.util.NoSuchElementException;
@@ -69,5 +70,19 @@ public class JabberJDOMMessageTest extends TestCase {
         } catch (NoSuchElementException ex) {
             fail("XMessages is empty should not throw an exception");
         }
+    }
+
+    /**
+     * encoding message with X Messages twice will cause a JDOM
+     * exception to be thrown.  (MUS-91)
+     */
+    public void testEncodingObjectsWithXMessage() throws Exception {
+        // create new presense message
+        JabberPresenceMessage msg = new JabberPresenceMessage();
+        // add X delay message
+        msg.setXMessage("jabber:x:delay",new DelayXMessage());
+        msg.encode();
+        //asking encode again should not throw exception
+        msg.encode();  
     }
 }

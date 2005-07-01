@@ -86,7 +86,7 @@ public class JabberJDOMMessage extends JabberMessage implements JabberMessagePar
             JabberMessage msg;
             msg = (JabberMessage) iter.next();
             if (JabberJDOMMessage.class.isAssignableFrom(msg.getClass())) {
-                msgTree.addContent(((JabberJDOMMessage) msg).getDOM());
+                msgTree.addContent(((JabberJDOMMessage) msg).getDOM().detach());
             } else {
                 //not assignable from JabberJDOMMessage, let's turn it into DOM first
                 try {
